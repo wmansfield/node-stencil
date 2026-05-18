@@ -1,0 +1,54 @@
+---
+description: Code is generated from XML — edit XML and run generator, never hand-edit generated files
+globs: backend/src/entities/**/*,backend/src/features/**/models/*,generation/**/*
+alwaysApply: true
+---
+
+# Code Generation Workflow
+
+**Most entity and API code is generated from XML.** Do not hand-edit generated files.
+
+## Workflow
+
+1. **Edit XML** — `../generation/xml/stencil-entities.xml` (from `server/api` workspace)
+2. **Run generator** — `cd ../generation/tools && ./code-generator-cli.exe` (config in `code-generator.config.xml`)
+3. **Customize extension files only** — `.manager.ts`, `.controller.ts`, `.module.ts`
+
+## Never Edit (STARTFILE — regenerated)
+
+- `*.model.ts`
+- `*.schema.ts`
+- `*.manager.base.ts`
+- `*.controller.base.ts`
+- `*.sanitized.validators.ts` (when part of entity generation)
+- `list-input-*.ts`
+- App layer entity models in `app/src/cloud/models/entities/` (when generated)
+
+## Safe to Edit (ENSUREFILE or hand-written)
+
+- `*.manager.ts` — extension with custom methods
+- `*.controller.ts` — extension with custom endpoints
+- `*.module.ts`
+- Feature request models in `backend/src/features/**/models/` — **check if generated**; feature entities may be generated from XML
+
+## Adding a New Entity
+
+1. Add `<item>` with `<field>` elements to XML
+2. Run generator
+3. Register in `entity.module.ts` and `entity.registry.ts`
+4. Add custom logic in `{entity}.manager.ts`
+
+## Adding a Field to Existing Entity
+
+1. Add `<field>` to the `<item>` in XML
+2. Run generator
+3. Update extension files (`.manager.ts`) if needed
+
+## Adding a New Enum
+
+1. Add `<enum>` to XML
+2. Run generator
+
+## Reference
+
+See `ai/code-generation.md` and `ai/patterns/extending-generated-code.md` for full schema and patterns.

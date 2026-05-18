@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items projectName="Stencil" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backendPrefix="backend\src\" frontendPrefix="frontend\src\" nativePrefix="..\..\app\src" securityEntity="jurisdiction" securityRoute="jurisdiction_id" mongooseVersion="9" >
+  <item name="LocalizedText" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="string" isNullable="true" friendlyName="Language Code">language_code</field>
+    <field type="string" isNullable="true" friendlyName="text">text</field>
+    <field type="string" isNullable="true" friendlyName="UI Hash">ui_hash</field>
+  </item>
+  <item name="ContentSection" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="ContentSectionKind" isEnum="true" isNullable="false" friendlyName="Content Section Kind">section_kind</field>
+    <field type="string" isNullable="true" maxLength="none" multiLine="true" friendlyName="Markdown">markdown</field>
+    <field type="string" isNullable="true" maxLength="none" friendlyName="Text">text</field>
+    <field type="string" isNullable="true" maxLength="none" friendlyName="Target">target</field>
+    <field type="int" isNullable="true" friendlyName="Sequence">sequence</field>
+    <field type="Uuid" isNullable="true" friendlyName="Asset">asset_id</field>
+    <field type="string" isNullable="true" friendlyName="UI Tag">ui_tag</field>
+    <field type="string" isNullable="true" friendlyName="UI Text">ui_text</field>
+    <field type="MediaInfo" isClass="true" isNullable="true" friendlyName="Photo">photo</field>
+    <field type="PreSignedUrl" isNullable="true" isClass="true" friendlyName="Upload Info">upload_info</field>
+  </item>
+  <item name="LocalizedContent" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="string" isNullable="true" friendlyName="Language Code">language_code</field>
+    <field type="ContentSection[]" isNullable="true" isClass="true" friendlyName="Contents">contents</field>
+    <field type="string" isNullable="true" friendlyName="UI Hash">ui_hash</field>
+  </item>
+  <item name="Dimension" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="int" isNullable="false" friendlyName="Width">width</field>
+    <field type="int" isNullable="false" friendlyName="Height">height</field>
+  </item>
+  <item name="FullDate" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="Date" isNullable="true" uiHidden="true" friendlyName="Utc">utc</field>
+    <field type="string" isNullable="true" uiHidden="true" friendlyName="Local">local</field>
+    <field type="string" isNullable="false" friendlyName="Literal">literal</field>
+    <field type="string" isNullable="false" friendlyName="Timezone">iana_zone</field>
+  </item>
+  <item name="MediaInfo" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="Uuid" isNullable="true" friendlyName="Id">_id</field>
+    <field type="AssetKind" isNullable="true" isEnum="true" friendlyName="asset_kind">asset_kind</field>
+    <field type="string" isNullable="true" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <field type="string" isNullable="true" friendlyName="Storage Key">storage_key</field>
+    <field type="string" isNullable="true" friendlyName="Thumb Key">thumb_small_key</field>
+    <field type="string" isNullable="true" friendlyName="Small Url">thumb_small_url</field>
+    <field type="Dimension" isNullable="true" isClass="true" friendlyName="Thumb Dimensions">thumb_small_dimensions</field>
+    <field type="string" isNullable="true" friendlyName="Large Key">thumb_large_key</field>
+    <field type="string" isNullable="true" friendlyName="Large Url">thumb_large_url</field>
+    <field type="Dimension" isNullable="true" isClass="true" friendlyName="Large Dimensions">thumb_large_dimensions</field>
+    <field type="string" isNullable="true" friendlyName="Raw Url">raw_url</field>
+  </item>
+  <item name="IDPair" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="string" isNullable="false" friendlyName="Id">_id</field>
+    <field type="string" isNullable="false" friendlyName="Text">text</field>
+  </item>
+  <item name="PreSignedUrl" classOnly="true" uiNestedComponent="true" useDocument="false">
+    <field type="string" isNullable="false" friendlyName="id">id</field>
+    <field type="string" isNullable="false" friendlyName="url">url</field>
+    <field type="string" isNullable="false" friendlyName="signed_url">signed_url</field>
+    <field type="string" isNullable="false" friendlyName="mime_type">mime_type</field>
+    <field type="AssetKind" isNullable="false" isEnum="true" friendlyName="asset_kind">asset_kind</field>
+    <field type="AssetDependency" isNullable="true" isEnum="true" friendlyName="Dependencies">dependency</field>
+    <field type="Uuid" isNullable="true" perspective="Process" friendlyName="Dependency ID">dependency_id</field>
+  </item>
+  <item name="GlobalSetting" friendlyName="Global Setting" tenant="Shared" useDocument="true">
+    <field type="string" isNullable="false" maxLength="100" friendlyName="Id">_id</field>
+    <field idAlias="true" type="string" isNullable="false" maxLength="100" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Name">name</field>
+    <field type="string" isNullable="true" maxLength="none" uiList="true" html="true" friendlyName="Value">value</field>
+  </item>
+  <item name="Timezone" friendlyName="Timezone" tenant="Shared" uiDefaultSort="ui_sort" useDocument="true">
+    <field type="string" isNullable="false" maxLength="100" friendlyName="Id">_id</field>
+    <field idAlias="true" type="string" isNullable="false" maxLength="100" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Zone">iana_zone</field>
+    <field type="string" isNullable="false" maxLength="100" uiList="true" sortable="true" searchable="true" friendlyName="Display Name">display_name</field>
+    <field type="string" isNullable="false" maxLength="100" uiList="true" sortable="true" searchable="true" friendlyName="Sort">ui_sort</field>
+    <field type="string" isNullable="true" maxLength="100" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Tag">tag</field>
+    <projection name="Public">
+      <entry>_id</entry>
+      <entry>iana_zone</entry>
+      <entry>ui_sort</entry>
+      <entry>display_name</entry>
+    </projection>
+  </item>
+  <item name="Role" friendlyName="Role" tenant="Shared" useDocument="true">
+    <field type="string" isNullable="false" maxLength="100" friendlyName="Id">_id</field>
+    <field idAlias="true" type="string" isNullable="false" maxLength="100" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Role Name">role_name</field>
+    <field type="string[]" isNullable="false" friendlyName="Permissions">permissions</field>
+    <uniquekey name="name">
+      <entry direction="Ascending">role_name</entry>
+    </uniquekey>
+  </item>
+  <item name="GlobalAccount" friendlyName="Global Account" tenant="Shared" useDocument="true">
+    <field type="Uuid" isNullable="false" maxLength="150" friendlyName="Id">_id</field>
+    <field type="string" isNullable="false" maxLength="150" uiList="true" searchable="true" getForSingle="true" friendlyName="Auth Identifier">auth_identifier</field>
+    <field type="string" isNullable="false" maxLength="10" foreignKey="Jurisdiction" foreignKeyField="_id" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <uniquekey name="auth">
+      <entry direction="Ascending">auth_identifier</entry>
+    </uniquekey>
+  </item>
+  <item name="Jurisdiction" friendlyName="Jurisdiction" tenant="Route" useDocument="true" uiDetail="true" >
+    <field type="string" isNullable="false" maxLength="10" friendlyName="Id">_id</field>
+    <field idAlias="true" type="string" isNullable="false" maxLength="10" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Jurisdiction Id">jurisdiction_id</field>
+    <projection name="Public">
+      <entry>_id</entry>
+    </projection>
+  </item>
+  <item name="JurisdictionSetting" friendlyName="Jurisdiction Setting" tenant="Isolated" useDocument="true" >
+    <field type="string" isNullable="false" maxLength="10" friendlyName="JurisdictionSetting">_id</field>
+    <field idAlias="true" type="string" isNullable="false" maxLength="10" uiList="true" filter="true" sortable="true" searchable="true" friendlyName="Name">name</field>
+    <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <field type="string" isNullable="true" maxLength="none" searchable="true" html="true" uiList="true" friendlyName="Value">value</field>
+    <uniquekey name="unique_setting">
+      <entry direction="Ascending">name</entry>
+    </uniquekey>
+  </item>
+  <item name="JurisdictionAsset" friendlyName="JurisdictionAsset" tenant="Isolated" useDocument="true" >
+    <field type="Uuid" isNullable="false" searchable="true" friendlyName="Id">_id</field>
+    <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <field type="AssetKind" isNullable="false" isEnum="true" uiList="true" friendlyName="Asset kind">asset_kind</field>
+    <field type="string" isNullable="false" maxLength="120" searchable="true" uiList="true" friendlyName="File Name">file_name</field>
+    <field type="string" isNullable="false" maxLength="512" html="true" uiList="true" friendlyName="Storage Key">storage_key</field>
+    <field type="int" isNullable="true" perspective="Process" friendlyName="Size KB">size_kb</field>
+    <field type="int" isNullable="true" perspective="Process" friendlyName="Duraction Secs">duration_secs</field>
+    <field type="AssetDependency" isEnum="true" perspective="Process" isNullable="true" friendlyName="Dependencies">dependency</field>
+    <field type="Uuid" isNullable="true" friendlyName="Account ID Creator">account_id_creator</field>
+    <field type="Uuid" isNullable="true" perspective="Process" friendlyName="Capsule ID">capsule_id</field>
+    <field type="Uuid" isNullable="true" perspective="Process" friendlyName="Dependency ID">dependency_id</field>
+    <field type="boolean" isNullable="false" perspective="Process" friendlyName="Available">available</field>
+    <field type="boolean" isNullable="false" perspective="Process" friendlyName="Should Resize">resize_required</field>
+    <field type="string" isNullable="true" perspective="Process" maxLength="20" friendlyName="Resize Status">resize_status</field>
+    <field type="int" isNullable="true" perspective="Process" friendlyName="Resize Attempts">resize_attempts</field>
+    <field type="Date" isNullable="true" perspective="Process" friendlyName="Resize Attempt Utc">resize_attempt_utc</field>
+    <field type="string" isNullable="true" maxLength="512" truncateLog="true" perspective="Process" friendlyName="Resize Log">resize_log</field>
+    <field type="Dimension" isNullable="true" isClass="true" perspective="Process" friendlyName="Thumb Dimensions">thumb_dimensions</field>
+    <field type="Dimension" isNullable="true" isClass="true" perspective="Process" friendlyName="Large Dimensions">large_dimensions</field>
+    <field type="string" isNullable="true" perspective="Process" html="true" maxLength="512" friendlyName="Thumb Key">thumb_small_key</field>
+    <field type="string" isNullable="true" perspective="Process" html="true" maxLength="512" friendlyName="Large Key">thumb_large_key</field>
+    <index name="dependencies">
+      <entry direction="Ascending">dependency</entry>
+      <entry direction="Ascending">dependency_id</entry>
+    </index>
+    <index name="resize">
+      <entry direction="Ascending">resize_required</entry>
+      <entry direction="Ascending">resize_attempts</entry>
+      <entry direction="Ascending">resize_status</entry>
+    </index>
+    <projection name="Info" get="true">
+      <entry>_id</entry>
+      <entry>jurisdiction_id</entry>
+      <entry>asset_kind</entry>
+      <entry>storage_key</entry>
+      <entry>thumb_dimensions</entry>
+      <entry>large_dimensions</entry>
+      <entry>thumb_small_key</entry>
+      <entry>thumb_large_key</entry>
+      <entry>duration_secs</entry>
+      <entry>size_kb</entry>
+      <field type="string" isNullable="true" friendlyName="Thumb Url">thumb_small_url</field>
+      <field type="string" isNullable="true" friendlyName="Large Url">thumb_large_url</field>
+      <field type="string" isNullable="true" friendlyName="Raw Url">raw_url</field>
+    </projection>
+    <shard>
+      <entry kind="hashed">_id</entry>
+    </shard>
+  </item>
+  <item name="Account" friendlyName="Account" tenant="Isolated" useDocument="true" uiDetail="true" uiDisplayField="display_name">
+    <field type="Uuid" isNullable="false" friendlyName="Id">_id</field>
+    <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <field type="Uuid" isNullable="true" perspective="Info" foreignKey="Asset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Avatar">asset_id_avatar</field>
+    <field type="string" isNullable="false" perspective="Status" maxLength="128" validate="email" uiList="true" searchable="true" sortable="true" recalculate="true" friendlyName="E-mail">email</field>
+    <field type="string" isNullable="true" perspective="Info" maxLength="150" searchable="true" sortable="true" uiList="true" friendlyName="Display Name">display_name</field>
+    <field type="string" isNullable="false" maxLength="150" uiList="true" searchable="true" friendlyName="Auth Identifier">auth_identifier</field>
+    <field type="string" isNullable="false" maxLength="150" uiList="true" searchable="true" friendlyName="Auth Provider">auth_provider</field>
+    <field type="Date" isNullable="false" friendlyName="Joined">joined_utc</field>
+    <field type="AccountStatus" isNullable="false" perspective="Status" isEnum="true" uiList="true" sortable="true" friendlyName="Status">account_status</field>
+    <field type="string[]" isNullable="true" perspective="Permissions" friendlyName="Roles">roles</field>
+    <field calculated="self" type="string" friendlyName="Email Upper">email_upper</field>
+    <field calculated="other" type="MediaInfo" isNullable="true" isClass="true" isAvatar="true" friendlyName="Avatar">avatar</field>
+    <projection name="Internal" get="true">
+      <entry>_id</entry>
+      <entry>email</entry>
+    </projection>
+    <projection name="Public" get="true">
+      <entry>_id</entry>
+      <entry>jurisdiction_id</entry>
+      <entry>display_name</entry>
+      <entry>avatar</entry>
+    </projection>
+    <projection name="Connection" get="true">
+      <entry>_id</entry>
+      <entry>jurisdiction_id</entry>
+      <entry>display_name</entry>
+      <entry>avatar</entry>
+    </projection>
+    <projection name="Self">
+      <entry>_id</entry>
+      <entry>email</entry>
+      <entry>joined_utc</entry>
+      <entry>display_name</entry>
+      <entry>roles</entry>
+      <entry>account_status</entry>
+      <entry>avatar</entry>
+      <entry>jurisdiction_id</entry>
+      <entry>auth_provider</entry>
+      <field type="string" friendlyName="Token">token</field>
+      <field type="boolean" friendlyName="Impersonated">impersonated</field>
+    </projection>
+    <projection name="Identity">
+      <entry>_id</entry>
+      <entry>auth_identifier</entry>
+    </projection>
+    <shard>
+      <entry kind="hashed">_id</entry>
+    </shard>
+  </item>
+  <item name="Widget" friendlyName="Widget" tenant="Isolated" useDocument="true" uiDetail="true" uiDisplayField="title">
+    <field type="Uuid" isNullable="false" friendlyName="Id">_id</field>
+    <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
+    <field type="Uuid" isNullable="true" foreignKey="Asset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Media Asset">asset_id_media</field>
+    <field type="string" isNullable="false" maxLength="200" uiList="true" searchable="true" sortable="true" friendlyName="Title">title</field>
+    <field type="LocalizedText[]" isNullable="true" perspective="Config" isClass="true" recalculate="true" friendlyName="Title Localized">title_localized</field>
+    <field type="string" isNullable="true" maxLength="none" perspective="Config" searchable="true" friendlyName="Description">description</field>
+    <field type="LocalizedContent[]" isNullable="true" perspective="Config" isClass="true" recalculate="true" friendlyName="Description Localized">description_localized</field>
+    <field calculated="other" type="MediaInfo" isNullable="true" isClass="true" friendlyName="Media">media</field>
+    <field type="FullDate" isNullable="true" isClass="true" friendlyName="Published Date">published_date</field>
+    <field type="IDPair" isNullable="true" isClass="true" friendlyName="Reference">reference</field>
+    <field calculated="other" type="MediaInfo" isNullable="true" isClass="true" isAvatar="true" friendlyName="Avatar">avatar</field>
+  </item>
+  <enum name="AccountStatus">
+    <field value="-1">disabled</field>
+    <field value="0">enabled</field>
+  </enum>
+  <enum name="AssetDependency">
+    <field value="0">account</field>
+    <field value="1">widget</field>
+  </enum>
+  <enum name="AssetArea">
+    <field value="0">jurisdiction</field>
+  </enum>
+  <enum name="AssetKind">
+    <field value="0">image</field>
+    <field value="1">audio</field>
+    <field value="2">avatar</field>
+  </enum>
+  <enum name="ContentSectionKind">
+    <field value="0">markdown</field>
+    <field value="1">spacer</field>
+    <field value="2">header</field>
+    <field value="3">image</field>
+    <field value="4">button</field>
+  </enum>
+  <feature name="auth" area="user" native="true">
+    <entity name="Account.Self" isItem="true"/>
+    <entity name="JurisdictionAsset.Info" isItem="true"/>
+    <entity name="RegisterRequest">
+      <field type="string">jurisdiction</field>
+      <field type="string">auth_token</field>
+      <field type="string">display_name</field>
+    </entity>
+    <mutation name="getSelf" route="v1/auth/self" authToken="auth_token" request="auth_token" requestType="string" itemResult="Account.Self" />
+    <mutation name="register" route="v1/auth/register" post="true" authToken="params.auth_token" authJurisdiction="params.jurisdiction" request="params" requestType="RegisterRequest" itemResult="Account.Self" />
+  </feature>
+  <feature name="media" area="user" native="true">
+    <entity name="PreSignedUrl" isItem="true"/>
+    <entity name="JurisdictionAsset.Info" isItem="true"/>
+    <entity name="UploadInfo">
+      <field type="AssetKind" isEnum="true">asset_kind</field>
+      <field type="AssetArea" isEnum="true">asset_area</field>
+      <field type="string">file_name</field>
+      <field type="string">mime_type</field>
+      <field type="int" isNullable="true">size_kb</field>
+      <field type="int" isNullable="true">duration_secs</field>
+      <field type="string" isNullable="false">jurisdiction_id</field>
+    </entity>
+    <entity name="RoutedPreSignedUrl">
+      <field type="PreSignedUrl" isClass="true">presigned</field>
+      <field type="string" isNullable="false">jurisdiction_id</field>
+    </entity>
+    <mutation name="uploadPrepare" route="v1/media/${params.jurisdiction_id}/prepare" request="params" requestType="UploadInfo" itemResult="PreSignedUrl" />
+    <mutation name="uploadComplete" route="v1/media/${params.jurisdiction_id}/complete" request="params" requestType="RoutedPreSignedUrl" itemResult="JurisdictionAsset.Info" />
+  </feature>
+  <feature name="profile" area="user" native="true">
+    <entity name="Account.Self" isItem="true"/>
+    <entity name="AvatarRequest">
+      <field type="Uuid">asset_id</field>
+    </entity>
+    <entity name="NameRequest">
+      <field type="string">display_name</field>
+    </entity>
+    <mutation name="nameUpdate" route="v1/profile/name" request="params" requestType="NameRequest" itemResult="Account.Self" />
+    <mutation name="avatarUpdate" route="v1/profile/avatar" request="params" requestType="AvatarRequest" itemResult="Account.Self" />
+  </feature>
+  <feature name="Task" area="admin">
+    <mutation name="triggerInvalidateEverything" route="platform/tasks/invalidateall" />
+    <mutation name="triggerSynchronization" route="platform/tasks/synchronization" />
+    <mutation name="triggerIndexSync" route="platform/tasks/indexer" />
+    <mutation name="triggerImageResize" route="platform/tasks/image-resize" />
+    <mutation name="triggerRoleSync" route="platform/tasks/role-sync" />
+  </feature>
+</items>

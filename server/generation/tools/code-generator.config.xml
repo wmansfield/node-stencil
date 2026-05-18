@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Options xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <OutputFolder>..\..\api</OutputFolder>
+  <DataFile>..\xml\stencil-entities.xml</DataFile>
+  <SelectedFiles>
+    <string>..\xsl\nest.controller.xsl</string>
+    <string>..\xsl\nest.manager.xsl</string>
+    <string>..\xsl\nest.model.xsl</string>
+    <string>..\xsl\nest.module.xsl</string>
+    <string>..\xsl\nest.schema.xsl</string>
+    <string>..\xsl\react.api.xsl</string>
+    <string>..\xsl\react.components.xsl</string>
+    <string>..\xsl\react.crud.xsl</string>
+    <string>..\xsl\react.model.xsl</string>
+  </SelectedFiles>
+  <UnSelectedFiles />
+  <WindowsLineEndings>true</WindowsLineEndings>
+</Options>

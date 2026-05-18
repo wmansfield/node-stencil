@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\version.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeGenerator.Core\CodeGenerator.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AssemblyName>code-generator</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Product>Code Generator</Product>
+    <Description>Code generation tool</Description>
+  </PropertyGroup>
+
+</Project>

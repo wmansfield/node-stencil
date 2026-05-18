@@ -1,0 +1,29 @@
+---
+description: Avoid PowerShell pipe-breaking patterns when running shell commands on Windows
+alwaysApply: true
+---
+
+# PowerShell Shell Command Rules
+
+When running shell commands on Windows (PowerShell), avoid piping git or other long-output commands through PowerShell cmdlets like `Select-Object`, `Where-Object`, etc. This can cause stream interruptions and connection errors.
+
+## Use native tool flags instead
+
+```bash
+# BAD - PowerShell pipe can break the stream
+git log --oneline | Select-Object -First 20
+git show abc123 --stat --name-only | Select-Object -First 50
+
+# GOOD - Use git's own flags to limit output
+git log --oneline -20
+git show abc123 --name-only --format=""
+```
+
+## General rules
+
+- Prefer native command flags over PowerShell pipes for limiting/filtering output
+- For `git log`, use `-n` or `-<number>` to limit results
+- For `git show`, use `--name-only`, `--format=""`, `--stat` etc.
+- For `git diff`, use `--stat` or path filters
+- Avoid `head`, `tail`, `wc` — these are not available in PowerShell
+- If you must filter output, prefer `rg` (ripgrep) over PowerShell cmdlets

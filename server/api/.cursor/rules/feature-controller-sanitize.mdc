@@ -1,0 +1,46 @@
+---
+description: Feature controllers must use Sanitize.for() on all @Body() payload parameters
+globs: backend/src/features/**/*.controller.ts
+alwaysApply: false
+---
+
+# Feature Controller Body Sanitization
+
+Every `@Body()` parameter in a feature controller **must** use the `Sanitize.for()` pipe. Never use a bare `@Body()` for typed payloads.
+
+## Required pattern
+
+```typescript
+@Body(Sanitize.for(CommentCreateRequest)) input: ICommentCreateRequest
+```
+
+## Prohibited pattern
+
+```typescript
+@Body() input: ICommentCreateRequest   // BAD: missing Sanitize.for()
+```
+
+## How it works
+
+1. Each feature request type has a **generated** model file with:
+   - Interface (e.g. `ICommentCreateRequest`) for type annotations
+   - Registry class (e.g. `CommentCreateRequest`) for the validation key
+   - Field-level validators (assertUuid, assertString, assertDate, assertEnum, etc.) that auto-register when the class is imported
+2. The controller imports the model and wires it up:
+
+```typescript
+import { ICommentCreateRequest, CommentCreateRequest } from './models/commentcreaterequest';
+import { Sanitize } from 'src/shared/utils/sanitized';
+```
+
+## Rules
+
+- The model file is **generated** -- do not hand-edit it.
+- The controller is **hand-written** -- the developer must add `Sanitize.for(RequestClass)` to every `@Body()`.
+- Validators auto-register when the class is imported, so no separate side-effect import is needed.
+- `Sanitize.for()` takes the **class** (e.g. `CommentCreateRequest`), not the interface.
+- The `@Body()` parameter type annotation uses the **interface** (e.g. `ICommentCreateRequest`).
+- For entity types (e.g. `AccountSettings`, `Invitation.Owned`), use `Sanitize.for(EntityClass)` and import the entity's `*.sanitized.validators.ts` for side-effect.
+- For endpoints that intentionally bypass validation (e.g. third-party webhooks), use `Sanitize.ignore()`:`typescript
+@Body(Sanitize.ignore()) payload: WebhookPayload
+`- **No bare `@Body()` is allowed.** Every `@Body()` must use either `Sanitize.for(...)` or `Sanitize.ignore()`.

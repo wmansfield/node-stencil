@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\version.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeGenerator.Core\CodeGenerator.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta6.25358.103" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AssemblyName>code-generator-cli</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Product>Code Generator CLI</Product>
+    <Description>Command-line code generation tool</Description>
+  </PropertyGroup>
+
+</Project>

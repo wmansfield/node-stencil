@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <!-- Version format: Major.Minor.Build.Revision -->
+    <!-- Build and Revision will be auto-generated based on date -->
+    <VersionMajor>3</VersionMajor>
+    <VersionMinor>1</VersionMinor>
+    <VersionBuild>6</VersionBuild>
+    <VersionRevision>1</VersionRevision>
+    
+    <!-- Auto-generated version strings -->
+    <Version>$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)</Version>
+    <AssemblyVersion>$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)</AssemblyVersion>
+    <FileVersion>$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)</FileVersion>
+    
+    <!-- Assembly metadata -->
+    <Company>Code Generator</Company>
+    <Copyright>Copyright © 2025 Anyone Working With Will</Copyright>
+  </PropertyGroup>
+</Project> 

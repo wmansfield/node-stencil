@@ -1,0 +1,89 @@
+# Multi-stage build for NestJS backend
+FROM node:23-slim AS base
+
+# Install dependencies for native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Build stage
+FROM base AS builder
+
+# Install all dependencies (including dev dependencies) for building
+RUN npm install
+RUN npm --workspace=backend install
+
+# Copy source code
+COPY . .
+
+# Build backend
+WORKDIR /app/backend
+RUN npm run build
+
+# Production stage
+FROM node:23-slim AS production
+
+# Install dependencies for native modules and AWS CLI in production
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    wget \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf awscliv2.zip aws
+
+# Create app user
+RUN groupadd -r nestjs && useradd -r -g nestjs nestjs
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install only production dependencies
+RUN npm ci --only=production
+RUN npm --workspace=backend ci --only=production
+
+# Copy built backend application
+COPY --from=builder --chown=nestjs:nestjs /app/backend/dist ./backend/dist
+
+# Copy MongoDB encryption shared libraries
+COPY --from=builder --chown=nestjs:nestjs /app/backend/mongo_crypt_v1.dll ./backend/
+COPY --from=builder --chown=nestjs:nestjs /app/backend/mongo_crypt_v1.so ./backend/
+
+# Copy entrypoint script
+COPY --chown=nestjs:nestjs backend/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Switch to non-root user
+USER nestjs
+
+# Expose port
+EXPOSE 3001
+
+# Set environment
+ENV NODE_ENV=production
+ARG BUILD_SHA=unknown
+ENV BUILD_SHA=$BUILD_SHA
+
+# Entrypoint fetches secrets from AWS Secrets Manager before starting
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Start the backend application
+CMD ["npm", "--workspace=backend", "run", "start:prod"]

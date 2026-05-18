@@ -1,0 +1,80 @@
+# Federation local development: 4 API instances (one per jurisdiction)
+#
+# Each instance uses your existing .env for base config (Mongo URIs, Firebase, etc.)
+# and overrides only the federation-specific settings.
+#
+# Production deployments use Fargate -- this file is local dev only.
+#
+# Usage:
+#   docker compose -f docker-compose.federation.yml up --build
+#
+# Each instance is accessible at:
+#   US  -> http://localhost:3001
+#   CA  -> http://localhost:3002
+#   UK  -> http://localhost:3003
+#   EU  -> http://localhost:3004
+
+services:
+  api-us:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      FEDERATION_MODE: development
+      FEDERATION_JURISDICTION: US,SHARED
+      FEDERATION_ENDPOINTS: '{"CA":"http://api-ca:3001","UK":"http://api-uk:3001","EU":"http://api-eu:3001"}'
+      FEDERATION_DEV_TOKEN: dev-token-local
+    ports:
+      - "3001:3001"
+
+  api-ca:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      FEDERATION_MODE: development
+      FEDERATION_JURISDICTION: CA
+      FEDERATION_ENDPOINTS: '{"US":"http://api-us:3001","UK":"http://api-uk:3001","EU":"http://api-eu:3001","SHARED":"http://api-us:3001"}'
+      FEDERATION_DEV_TOKEN: dev-token-local
+    ports:
+      - "3002:3001"
+
+  api-uk:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      FEDERATION_MODE: development
+      FEDERATION_JURISDICTION: UK
+      FEDERATION_ENDPOINTS: '{"US":"http://api-us:3001","CA":"http://api-ca:3001","EU":"http://api-eu:3001","SHARED":"http://api-us:3001"}'
+      FEDERATION_DEV_TOKEN: dev-token-local
+    ports:
+      - "3003:3001"
+
+  api-eu:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      FEDERATION_MODE: development
+      FEDERATION_JURISDICTION: EU
+      FEDERATION_ENDPOINTS: '{"US":"http://api-us:3001","CA":"http://api-ca:3001","UK":"http://api-uk:3001","SHARED":"http://api-us:3001"}'
+      FEDERATION_DEV_TOKEN: dev-token-local
+    ports:
+      - "3004:3001"

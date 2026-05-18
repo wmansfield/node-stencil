@@ -1,0 +1,17 @@
+{
+   "moduleFileExtensions": ["js", "json", "ts"],
+   "rootDir": "..",
+   "testRegex": "test/features/.*\\.e2e-spec\\.ts$",
+   "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+   },
+   "transformIgnorePatterns": [
+      "node_modules/(?!(@noble)/)"
+   ],
+   "testEnvironment": "node",
+   "preset": "ts-jest",
+   "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+   },
+   "testTimeout": 60000
+}
