@@ -163,6 +163,14 @@ cp frontend/.env.example frontend/.env
 npm start
 ```
 
+Before signing in for the first time, seed reference data (roles, timezones, jurisdictions):
+
+```bash
+curl http://localhost:3001/api/platform/bootstrap
+```
+
+Or open [http://localhost:3001/api/platform/bootstrap](http://localhost:3001/api/platform/bootstrap) in a browser. This endpoint is idempotent, requires no authentication, and is only available when `NODE_ENV` is not `production`.
+
 `frontend/.env.example` sets `VITE_API_BASE_URL=http://localhost:3001/api` for local dev. Leave all `VITE_FIREBASE_*` values empty unless you are using SSO (must match backend Firebase config). Set `VITE_ADMIN_GATE_TOKEN` only if `ADMIN_GATE_TOKEN` is set on the backend.
 
 **Sign in without SSO** — leave Firebase unset in `backend/.env` and `frontend/.env` (no `FIREBASE_PROJECT_ID` / `VITE_FIREBASE_*`). The app uses local auth; sign in at http://localhost:3000 with:
