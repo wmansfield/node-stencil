@@ -58,7 +58,7 @@ export class FilePathUtil {
    }
 
    /**
-    * Generates a storage path for encrypted capsule assets.
+    * Generates a storage path for encrypted assets.
     * Organized by month and account prefix for scale:
     *   v1/{jurisdiction}/encrypted/{YYYY-MM}/{account_prefix}/{asset_id}.enc
     */

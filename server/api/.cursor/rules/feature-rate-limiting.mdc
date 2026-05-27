@@ -1,0 +1,20 @@
+---
+description: Authenticated feature endpoints must pair AuthGuard with RateLimitGuard and @RateLimit
+globs: backend/src/features/**/*.controller.ts
+alwaysApply: false
+---
+
+# Feature Endpoint Rate Limiting
+
+Authenticated feature endpoints should pair `AuthGuard` with `RateLimitGuard` and an endpoint-specific `@RateLimit(...)`.
+
+```typescript
+@RateLimit({ points: 30, duration: 60 })
+@UseGuards(AuthGuard, RateLimitGuard)
+@Post('create')
+async create(...) { ... }
+```
+
+Public endpoints use IP-based rate limiting when exposed to untrusted callers. Webhooks, health, federation, bootstrap, and one-off confirmation links may use different guard/auth patterns, but should make the reason obvious in code or docs.
+
+Use `developers/rate-limiting.md` for limit choices and `developers/VERIFICATION.md` for the invariant checklist.

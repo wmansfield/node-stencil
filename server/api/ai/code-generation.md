@@ -2,7 +2,7 @@
 
 **This is the most important file in the AI knowledge base.**
 
-The codebase is largely generated from a single XML file. Understanding this system is essential for making changes correctly.
+The Stencil codebase is largely generated from a single XML file. Understanding this system is essential for making changes correctly.
 
 ## Overview
 
@@ -26,8 +26,11 @@ stencil-entities.xml  --[XSL Templates]-->  Generated Code
 ```bash
 cd server/generation/tools
 ./code-generator-cli.exe
-# Config is read from code-generator.config.xml in the same folder
 ```
+
+The CLI reads `code-generator.config.xml`, which points at `../xml/stencil-entities.xml`.
+
+Or use the GUI: `./code-generator.exe`
 
 ## Generated Output
 
@@ -36,11 +39,12 @@ cd server/generation/tools
 |----------|--------|-------|
 | `nest.model.xsl` | `{entity}.model.ts` | STARTFILE |
 | `nest.schema.xsl` | `{entity}.schema.ts` | STARTFILE |
-| `nest.module.xsl` | `{entity}.module.ts` | ENSUREFILE |
+| `nest.module.xsl` | `{entity}.module.ts` | STARTFILE |
 | `nest.manager.xsl` | `{entity}.manager.base.ts` | STARTFILE |
 | `nest.manager.xsl` | `{entity}.manager.ts` | ENSUREFILE |
 | `nest.controller.xsl` | `{entity}.controller.base.ts` | STARTFILE |
 | `nest.controller.xsl` | `{entity}.controller.ts` | ENSUREFILE |
+| `nest.module.xsl` | `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts` | STARTFILE |
 
 ### Frontend (React)
 | Template | Output | Token |
@@ -51,10 +55,27 @@ cd server/generation/tools
 | `react.crud.xsl` | `views/super/crud/{entity}/{Entity}Editor.tsx` | ENSUREFILE |
 | `react.components.xsl` | `views/super/pickers/{Enum}Picker.tsx` | ENSUREFILE |
 
+### Mobile (React Native)
+| Template | Output |
+|----------|--------|
+| `react.native.model.xsl` | `app/src/cloud/models/entities/{entity}.ts` |
+| `react.native.api.xsl` | `app/src/cloud/api/{feature}Api.ts` |
+
 ## File Generation Tokens
 
 - **STARTFILE**: Creates/overwrites file every time generator runs
 - **ENSUREFILE**: Creates file only if it doesn't exist (safe for customization)
+
+## Never Hand-Edit STARTFILE Output
+
+Do not edit these directly. Change XML or XSL, run the generator, then customize extension files:
+
+- Backend `*.model.ts`, `*.schema.ts`, `*.manager.base.ts`, `*.controller.base.ts`
+- Backend `*.sanitized.validators.ts`, `list-input-*.ts`
+- Backend generated aggregators: `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts`
+- Generated frontend/app entity models and API stubs
+
+`*.manager.ts`, `*.controller.ts`, and generated CRUD/admin views may be ENSUREFILE customization points. Check the generated token and local pattern before editing.
 
 ---
 
@@ -64,20 +85,21 @@ cd server/generation/tools
 
 ```xml
 <items projectName="Stencil"
-       backendPrefix="backend\src\"
-       frontendPrefix="frontend\src\"
-       securityEntity="jurisdiction"
+       backendPrefix="backend\src\" 
+       frontendPrefix="frontend\src\" 
+       nativePrefix="..\..\app\src"
+       securityEntity="jurisdiction" 
        securityRoute="jurisdiction_id">
 ```
 
 ### Entity Definition (`<item>`)
 
 ```xml
-<item name="Widget"
-      friendlyName="Widget"
-      tenant="Isolated"
-      useDocument="true"
-      uiDisplayField="title"
+<item name="Account" 
+      friendlyName="Account" 
+      tenant="Isolated" 
+      useDocument="true" 
+      uiDisplayField="display_name"
       uiDetail="true"
       uiDefaultSort="created_utc">
 ```
@@ -96,23 +118,25 @@ cd server/generation/tools
 ### Field Definition (`<field>`)
 
 ```xml
-<field type="string"
-       isNullable="true"
-       maxLength="150"
-       searchable="true"
-       sortable="true"
+<field type="string" 
+       isNullable="true" 
+       maxLength="150" 
+       searchable="true" 
+       sortable="true" 
        uiList="true"
        filter="true"
        perspective="Info"
        foreignKey="Asset"
        foreignKeyField="_id"
-       friendlyName="Title">title</field>
+       validate="email"
+       friendlyName="Display Name">display_name</field>
 ```
 
 | Attribute | Values | Description |
 |-----------|--------|-------------|
 | `type` | `string`, `int`, `boolean`, `Date`, `Uuid`, `EntityName`, `EnumName`, `EntityName[]` | Field type |
 | `isNullable` | boolean | Can be null |
+| `isEnum="true"` | boolean | Type is an enum |
 | `isClass="true"` | boolean | Type is another entity/class |
 | `maxLength` | number or `"none"` | String max length |
 | `searchable` | boolean | Include in text search |
@@ -126,7 +150,14 @@ cd server/generation/tools
 | `foreignKeyInvalidatesMe` | boolean | Recalculate when FK changes |
 | `calculated` | `"self"`, `"other"` | Computed field |
 | `recalculate` | boolean | Field triggers recalculation |
+| `validate` | `"email"` | Validation rule |
+| `encrypted` | boolean | Encrypt field value |
+| `html` | boolean | Allow HTML content |
+| `readOnly` | boolean | Cannot be modified after creation |
+| `truncateLog` | boolean | Truncate in logs |
+| `idAlias` | boolean | Alternative ID field |
 | `tenant` | boolean | This field is the tenant ID |
+| `getForSingle` | boolean | Include when fetching single item |
 
 ### Projection Definition
 
@@ -134,6 +165,7 @@ cd server/generation/tools
 <projection name="Public" get="true">
   <entry>_id</entry>
   <entry>display_name</entry>
+  <entry>handle</entry>
   <!-- Computed field only in projection -->
   <field type="string" friendlyName="Token">token</field>
 </projection>
@@ -144,9 +176,9 @@ Creates `Entity.Public` type with only specified fields. `get="true"` generates 
 ### Index Definition
 
 ```xml
-<index name="by_jurisdiction_created">
-  <entry direction="Ascending">jurisdiction_id</entry>
-  <entry direction="Ascending">created_utc</entry>
+<index name="by_owner">
+  <entry direction="Ascending">owner_account_id</entry>
+  <entry direction="Descending">created_utc</entry>
 </index>
 
 <uniquekey name="unique_pair">
@@ -164,7 +196,7 @@ Creates `Entity.Public` type with only specified fields. `get="true"` generates 
 
 ```xml
 <shard>
-  <entry kind="hashed">jurisdiction_id</entry>
+  <entry kind="hashed">account_id</entry>
 </shard>
 ```
 
@@ -184,9 +216,9 @@ Generates:
 
 ---
 
-## Feature Definition (User-Facing APIs)
+## Feature Definition (Native App APIs)
 
-Features define API endpoints for user-facing clients (web, mobile):
+Features define API endpoints for the mobile app:
 
 ```xml
 <feature name="auth" area="user" native="true">
@@ -194,25 +226,23 @@ Features define API endpoints for user-facing clients (web, mobile):
   <entity name="RegisterRequest">
     <field type="string">jurisdiction</field>
     <field type="string">auth_token</field>
-    <field type="string">display_name</field>
   </entity>
-
+  
   <!-- GET endpoint -->
-  <query name="getSelf"
-         route="v1/auth/self"
-         authToken="auth_token"
-         request="auth_token"
-         requestType="string"
+  <query name="getSelf" 
+         route="v1/auth/self" 
+         authToken="auth_token" 
+         request="auth_token" 
+         requestType="string" 
          itemResult="Account.Self" />
-
+  
   <!-- POST endpoint -->
-  <mutation name="register"
-            route="v1/auth/register"
+  <mutation name="register" 
+            route="v1/auth/register" 
             post="true"
-            authToken="params.auth_token"
-            authJurisdiction="params.jurisdiction"
-            request="params"
-            requestType="RegisterRequest"
+            authToken="params.auth_token" 
+            request="params" 
+            requestType="RegisterRequest" 
             itemResult="Account.Self" />
 </feature>
 ```
@@ -231,7 +261,7 @@ Features define API endpoints for user-facing clients (web, mobile):
 
 1. Add `<item>` to XML with fields
 2. Run generator
-3. Register module in `entity.module.ts` and `entity.registry.ts`
+3. Confirm regenerated `entity.module.ts`, `entity.registry.ts`, and `account-deletion-manager.ts` include the entity when applicable
 4. Customize `{entity}.manager.ts` for business logic
 
 ### Adding a New Enum

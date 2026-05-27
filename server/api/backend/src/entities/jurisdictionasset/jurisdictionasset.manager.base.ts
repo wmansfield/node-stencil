@@ -242,7 +242,6 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
             size_kb: perspective.size_kb,
             duration_secs: perspective.duration_secs,
             dependency: perspective.dependency,
-            capsule_id: perspective.capsule_id,
             dependency_id: perspective.dependency_id,
             available: perspective.available,
             resize_required: perspective.resize_required,
@@ -286,9 +285,6 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
       }
       if (perspective.dependency === undefined) {
          fieldsToRemove.push("dependency");
-      }
-      if (perspective.capsule_id === undefined) {
-         fieldsToRemove.push("capsule_id");
       }
       if (perspective.dependency_id === undefined) {
          fieldsToRemove.push("dependency_id");
@@ -444,9 +440,6 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
       if (document.account_id_creator === undefined) {
          fieldsToRemove.push('account_id_creator');
       }
-      if (document.capsule_id === undefined) {
-         fieldsToRemove.push('capsule_id');
-      }
       if (document.dependency_id === undefined) {
          fieldsToRemove.push('dependency_id');
       }
@@ -478,9 +471,6 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
       // Empty Guids
       if (document.account_id_creator === undefined || document.account_id_creator === '') {
          fieldsToRemove.push('account_id_creator');
-      }
-      if (document.capsule_id === undefined || document.capsule_id === '') {
-         fieldsToRemove.push('capsule_id');
       }
       if (document.dependency_id === undefined || document.dependency_id === '') {
          fieldsToRemove.push('dependency_id');

@@ -1,0 +1,64 @@
+---
+description: Federated and sync-tracked normal deletes use tombstones; GDPR/DSAR processors may hard-delete
+globs: **/*.ts
+alwaysApply: true
+---
+
+# Federated & Sync-Tracked Deletions Use Tombstones
+
+Any entity that participates in mobile delta-sync (driven by an `edited_utc` cursor) or in cross-jurisdiction federation **must not be physically removed in normal business flows**. Deletes are recorded by setting `deleted_utc` and bumping `edited_utc` so the deletion propagates through the same channels as any other edit.
+
+## Why
+
+Sync requires the invariant **absence is never information; presence-of-a-tombstone is**. If a row is gone in jurisdiction A but still exists in jurisdiction B (or on a mobile client), A has no way to tell whether the row was deliberately deleted or simply hasn't been replicated yet:
+
+- The mobile client pulling `since: T` only sees what changed; it can't observe what *vanished*.
+- Reconciliation (`findUnreplicated`) and the skew healer treat missing rows as insert-time gaps to be re-replicated — exactly the wrong behavior for a deliberate removal.
+- `updateManyPartial` against a missing row silently no-ops, hiding the divergence.
+
+A tombstone (`deleted_utc != null`) is just another edit: it flows through parent edit cascades (or their analog), surfaces in the next delta-sync response, and gives every consumer — local rows, remote rows, mobile clients — a single explicit signal.
+
+## Pattern to Avoid
+
+```typescript
+// BAD — physical delete on a dual-homed entity
+async cancelParticipant(participant: DualHomedParticipant): Promise<void> {
+   await this.entities.participantManager.delete(participant);
+   // mobile delta-sync never sees this; remote-jurisdiction row is now orphaned;
+   // reconciler will eventually try to "heal" the missing row by re-replicating it.
+}
+
+// BAD — upserting around a missing row to "fix" sync drift
+await broker.updateManyPartial(jurisdictionId, filter, update, { upsert: true });
+// resurrects rows another jurisdiction may have legitimately tombstoned.
+```
+
+## Correct Pattern
+
+```typescript
+// GOOD — tombstone + cascade
+async cancelParticipant(participant: DualHomedParticipant): Promise<void> {
+   const now = new Date();
+   await this.brokers.participant.updateManyPartial(
+      participant.local_jurisdiction_id,
+      { _id: participant._id },
+      { $set: { deleted_utc: now, edited_utc: now, updated_utc: now } },
+   );
+   // Cascade fans the edited_utc bump out so every sibling row + the mobile
+   // delta-sync sees the tombstone in the next pull.
+   this.cascadeService.cascade(parentEntity, now);
+}
+```
+
+## Rules
+
+- **No `delete()` / `deleteOne()` / `findOneAndDelete()` on federated or sync-tracked entities.** Use `deleted_utc`.
+- **No `upsert` on `updateManyPartial`** for federated entities — a missing row is either an insert-time gap (handled by reconciliation) or a tombstone (handled by reading `deleted_utc`). Either way, resurrection is wrong.
+- Mobile-facing projections that filter out tombstones must do so explicitly (`deleted_utc: { $exists: false }`) and document why; the field itself stays in the entity model.
+- Hard physical deletion is reserved for explicit GDPR/DSAR/account-deletion processors, not normal business logic.
+
+## See Also
+
+- `interface-contract-integrity.mdc` — `findUnreplicated` is the heal path for *insert-time* gaps; do not extend it to handle deletion gaps.
+- `code-generation-workflow.mdc` — `deleted_utc` should be added in XML alongside `created_utc` / `updated_utc` for any new sync-tracked entity.
+- `ai/patterns/federation-and-dual-homed.md` — longer federation and tombstone guidance.

@@ -1,0 +1,23 @@
+---
+description: Do not log full stable user identifiers such as Firebase UID or auth_identifier
+globs: backend/src/**/*.ts
+alwaysApply: false
+---
+
+# Privacy-Safe Logging
+
+Never log full stable user identifiers:
+
+- Firebase UID / JWT `sub`
+- `auth_identifier`
+- RevenueCat app user ID when it aliases Firebase UID
+- device fingerprints or push tokens
+
+Prefer no identifier. If correlation is necessary, truncate consistently:
+
+```typescript
+const safeUid = `${uid.slice(0, 8)}***`;
+this.logger.warn(`Failed key recovery for uid=${safeUid}`);
+```
+
+Do not include these identifiers in `searchable` projections, API error messages, or client console logs.

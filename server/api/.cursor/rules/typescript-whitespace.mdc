@@ -1,5 +1,5 @@
 ---
-description: Avoid excessive blank lines in TypeScript files; always use braces for control flow
+description: Avoid excessive blank lines in TypeScript files
 globs: "**/*.ts"
 alwaysApply: false
 ---
@@ -22,26 +22,8 @@ for (const item of items) {
 
 // GOOD
 for (const item of items) {
-   if (this.isShuttingDown) { break; }
+   if (this.isShuttingDown) break;
    const result = await this.process(item);
    processed += result.count;
 }
 ```
-
-# Always Use Braces for Control Flow
-
-Never write braceless single-line control flow. Always wrap the body in braces, even for a single statement. Braceless forms are easy to misread and error-prone when lines are added later.
-
-```typescript
-// BAD
-if (this.isShuttingDown) break;
-if (!account) return null;
-for (const x of items) doSomething(x);
-
-// GOOD
-if (this.isShuttingDown) { break; }
-if (!account) { return null; }
-for (const x of items) { doSomething(x); }
-```
-
-This applies to `if`, `else`, `for`, `while`, `do`, and any other control flow construct.

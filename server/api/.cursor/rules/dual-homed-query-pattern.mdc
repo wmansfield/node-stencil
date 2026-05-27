@@ -1,0 +1,40 @@
+---
+description: Dual-homed (federated) entity query pattern — always filter by local_account_id
+alwaysApply: true
+---
+
+# Dual-Homed Entity Query Pattern
+
+Every dual-homed entity stores **two rows per relationship** — a local perspective and a remote perspective. In single-jurisdiction deployments both rows live in the same collection.
+
+## Rule: Always filter by `local_account_id`
+
+When querying dual-homed entities, **always** include `local_account_id` in the filter to select one perspective. Never query by a grouping field alone (such as `parent_id` or `target_id`) — this returns both perspectives and causes duplicates.
+
+```typescript
+// BAD — returns both perspectives in single-jurisdiction
+const filter = { parent_id };
+
+// GOOD — scoped to one perspective
+const filter = { parent_id, local_account_id: account_id };
+```
+
+## Correct read pattern
+
+1. **Local read**: query the dual-homed collection filtered by `local_account_id` (your perspective)
+2. **Federated hydration**: if you need the parent entity, fetch it via federation client from its home `jurisdiction_id`
+3. **Action**: validate against the federated parent, then write locally + broker the dual-homed write
+
+## Reference pattern
+
+Manager methods should always scope by `local_account_id`:
+
+```typescript
+findForAccount(account_id: string) {
+   return this.find({ local_account_id: account_id });
+}
+
+getForParentAndAccount(parent_id: string, account_id: string) {
+   return this.findOne({ parent_id, local_account_id: account_id });
+}
+```

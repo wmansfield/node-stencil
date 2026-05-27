@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JurisdictionAsset } from './jurisdictionasset.model';
 import { JurisdictionAssetManagerBase } from './jurisdictionasset.manager.base';
 import { MongoConnectionProvider } from 'src/shared/mongo/mongo-connection.provider';
@@ -77,12 +77,6 @@ export class JurisdictionAssetManager extends JurisdictionAssetManagerBase {
       );
 
       return result.items;
-   }
-
-   protected async preProcessMutationDocument(document: JurisdictionAsset, documentOperation: DocumentOperation): Promise<void> {
-      if (documentOperation === DocumentOperation.insert && document.capsule_id) {
-         throw new BadRequestException('capsule_id must not be set during asset creation; it is assigned during capsule create');
-      }
    }
 
    protected async postProcessMutationProcessPerspective(perspective: JurisdictionAsset.ProcessPerspective, documentOperation: DocumentOperation): Promise<void> {

@@ -1,0 +1,17 @@
+---
+description: Project design philosophy — when to simplify and when to build the full solution
+alwaysApply: true
+---
+# Design Philosophy
+
+## Complexity vs Feasibility
+
+Do not take shortcuts because the first version is complicated. Take shortcuts only when the full solution is non-feasible (money, time, resource constraints).
+
+If a feature requires a complex implementation to be done correctly, build it correctly. "Too complex for v1" is not a valid reason to cut corners on architecture or security. The valid reasons are:
+
+- The cost is prohibitive (infrastructure, third-party services)
+- The timeline doesn't allow it (ship date, dependency on unreleased platform features)
+- The team doesn't have the expertise and can't acquire it in time
+
+When proposing a simpler alternative, frame it in terms of feasibility, not difficulty.

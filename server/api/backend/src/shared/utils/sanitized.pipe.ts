@@ -59,7 +59,7 @@ export class SanitizedPipe implements PipeTransform {
       //
       // Object.assign handles both cases:
       //  - Entity classes whose constructor copies init data (e.g. Legal) — assign is a no-op
-      //  - Request-model marker classes with no constructor (e.g. CapsuleCreateRequest) —
+      //  - Request-model marker classes with no constructor (e.g. NameRequest) —
       //    assign copies the validated data onto the otherwise-empty instance
       if (this.entity) {
          try {

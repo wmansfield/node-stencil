@@ -151,12 +151,6 @@ export namespace JurisdictionAsset {
          ...ModelAnnotations.uuid,
          required: false,
       })
-      capsule_id: string;
-      
-      @Prop({
-         ...ModelAnnotations.uuid,
-         required: false,
-      })
       dependency_id: string;
       
       @Prop({

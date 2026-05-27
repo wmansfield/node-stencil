@@ -1,0 +1,55 @@
+---
+description: Don't extend typed contracts at call sites — add new behavior to the interface itself
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Interface Contract Integrity
+
+If a function needs a method that the contract interface doesn't declare, **add it to the interface**. Never extend the interface inline at the call site, especially with optional (`?`) methods.
+
+## Why
+
+Inline contract extensions silently bypass `implements`-clause checking. Any class that "implements" the base interface compiles cleanly even if it never wires the new method, and the runtime guard (`if (!manager.foo) return;`) hides the gap. Result: code that *appears* to do something ships doing nothing.
+
+## Pattern to Avoid
+
+```typescript
+// BAD — three production entity types silently no-oped a reconciler this way
+function reconcile<T>(
+   manager: IFederatedEntityManager<T> & { findUnreplicated?: (id: string, n: number) => Promise<T[]> },
+) {
+   if (!manager.findUnreplicated) return; // any implementer can omit; tsc never complains
+   const rows = await manager.findUnreplicated(...);
+}
+```
+
+Two failures stack here:
+1. Inline anonymous shape on a parameter type — also violates `typescript-named-types.mdc`.
+2. Optional contract method — `implements IFederatedEntityManager<T>` doesn't see the extension, so missing implementations compile.
+
+## Correct Pattern
+
+```typescript
+// GOOD — promote the method to the interface, force every implementer to wire it
+export type IFederatedEntityManager<T> = {
+   // ...existing required methods...
+   findUnreplicated: (jurisdiction_id: string, limit: number) => Promise<T[]>;
+};
+
+function reconcile<T>(manager: IFederatedEntityManager<T>) {
+   const rows = await manager.findUnreplicated(...); // contract guarantees it
+}
+```
+
+Now tsc refuses to compile any class that claims `implements IFederatedEntityManager<T>` without a real `findUnreplicated`.
+
+## Rules
+
+- New behavior on a typed contract → goes on the contract, not the call site.
+- Optional contract methods (`foo?: ...`) are forbidden unless absence is a deliberate, documented variation point with a clear default. Even then, prefer required + a no-op default implementation on a base class.
+- If you only need the new behavior on *one* implementer, that's a sign the method belongs as a public method on that concrete class, not on a contract — narrow the parameter type to the concrete class instead of widening the interface.
+
+## See Also
+
+- `typescript-named-types.mdc` — covers the related "no inline object types" rule.

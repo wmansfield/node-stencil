@@ -118,7 +118,6 @@
     <field type="int" isNullable="true" perspective="Process" friendlyName="Duraction Secs">duration_secs</field>
     <field type="AssetDependency" isEnum="true" perspective="Process" isNullable="true" friendlyName="Dependencies">dependency</field>
     <field type="Uuid" isNullable="true" friendlyName="Account ID Creator">account_id_creator</field>
-    <field type="Uuid" isNullable="true" perspective="Process" friendlyName="Capsule ID">capsule_id</field>
     <field type="Uuid" isNullable="true" perspective="Process" friendlyName="Dependency ID">dependency_id</field>
     <field type="boolean" isNullable="false" perspective="Process" friendlyName="Available">available</field>
     <field type="boolean" isNullable="false" perspective="Process" friendlyName="Should Resize">resize_required</field>

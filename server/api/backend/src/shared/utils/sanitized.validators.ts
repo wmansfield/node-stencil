@@ -55,7 +55,7 @@ export function assertEnum<T extends Record<string, unknown>>(enumObj: T): (valu
    };
 }
 
-/** Throws if value is not a plain object (when present). Used for nested shapes like Reactions. */
+/** Throws if value is not a plain object (when present). Used for nested object shapes. */
 export function assertPlainObject(value: unknown, key: string): void {
    if (value === undefined || value === null) return;
    if (typeof value !== 'object' || value === null || Array.isArray(value)) {

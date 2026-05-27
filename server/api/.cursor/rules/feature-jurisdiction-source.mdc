@@ -1,0 +1,27 @@
+---
+description: User feature routes use authenticated account jurisdiction, not caller-provided jurisdiction
+globs: backend/src/features/user/**/*.controller.ts
+alwaysApply: false
+---
+
+# User Feature Jurisdiction Source
+
+For authenticated `/v1/*` user feature routes, data access must use `request.account.jurisdiction_id`.
+
+## Required
+
+```typescript
+if (!request.account) {
+   throw new ForbiddenException();
+}
+const jurisdiction_id = request.account.jurisdiction_id;
+await this.entities.widgetManager.getById(jurisdiction_id, input.widget_id);
+```
+
+## Avoid
+
+```typescript
+await this.entities.widgetManager.getById(input.jurisdiction_id, input.widget_id);
+```
+
+Caller-provided jurisdiction is valid for admin routes, federation routes, public legal/bootstrap flows, webhooks, or documented cross-jurisdiction hydration. For user-owned data, the authenticated account is the source of truth.

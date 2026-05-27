@@ -185,8 +185,10 @@ For pickers and other components, the pattern is similar - ENSUREFILE creates th
 - `*.schema.ts`
 - `*.manager.base.ts`
 - `*.controller.base.ts`
-- `*Api.ts` (in frontend stencil/endpoints/)
+- `*Api.ts` (in frontend `stencil/endpoints/`)
 - `list-input-*.ts` (request types)
+- `*.sanitized.validators.ts`
+- `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts`
 
 ## Safe to Edit
 
@@ -194,7 +196,7 @@ These files use ENSUREFILE and are safe to customize:
 
 - `*.manager.ts` (extension)
 - `*.controller.ts` (extension)
-- `*.module.ts`
+- Entity-specific `*.module.ts` only when confirmed as ENSUREFILE/custom
 - `*List.tsx`
 - `*Editor.tsx`
 - `*Detail.tsx`

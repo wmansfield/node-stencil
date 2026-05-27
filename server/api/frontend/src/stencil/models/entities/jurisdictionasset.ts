@@ -18,7 +18,6 @@ export interface IJurisdictionAsset extends IJurisdictionAssetOption  {
   duration_secs?: number;
   dependency?: AssetDependency;
   account_id_creator?: string;
-  capsule_id?: string;
   dependency_id?: string;
   available: boolean;
   resize_required: boolean;
@@ -67,7 +66,6 @@ function JurisdictionAsset(updates?: PartialDeep<IJurisdictionAsset>, original?:
     duration_secs: undefined!,
     dependency: undefined!,
     account_id_creator: undefined!,
-    capsule_id: undefined!,
     dependency_id: undefined!,
     available: false,
     resize_required: false,

@@ -17,7 +17,6 @@ export class JurisdictionAsset {
       duration_secs: 1,
       dependency: 1,
       account_id_creator: 1,
-      capsule_id: 1,
       dependency_id: 1,
       available: 1,
       resize_required: 1,
@@ -44,7 +43,6 @@ export class JurisdictionAsset {
    duration_secs?: number;
    dependency?: AssetDependency;
    account_id_creator?: string;
-   capsule_id?: string;
    dependency_id?: string;
    available: boolean;
    resize_required: boolean;
@@ -131,10 +129,6 @@ export class JurisdictionAsset {
       
       if (partial.account_id_creator !== undefined) {
          this.account_id_creator = partial.account_id_creator!;
-      }
-      
-      if (partial.capsule_id !== undefined) {
-         this.capsule_id = partial.capsule_id!;
       }
       
       if (partial.dependency_id !== undefined) {
@@ -233,13 +227,6 @@ export namespace JurisdictionAsset {
       }
       get dependency() : AssetDependency | undefined {
          return this.actual.dependency;
-      }
-      
-      set capsule_id(value: string | undefined) { 
-         this.actual.capsule_id = value;
-      }
-      get capsule_id() : string | undefined {
-         return this.actual.capsule_id;
       }
       
       set dependency_id(value: string | undefined) { 

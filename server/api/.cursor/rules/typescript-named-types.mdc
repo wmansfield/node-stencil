@@ -1,5 +1,5 @@
 ---
-description: Always use named types instead of inline object types; feature endpoint request/response types belong in XML not hand-coded
+description: Always use named types instead of inline object types
 globs: "**/*.ts"
 alwaysApply: false
 ---
@@ -20,26 +20,4 @@ interface ProcessResult {
 async process(): Promise<ProcessResult> { ... }
 ```
 
-## Feature Endpoint DTOs (Request/Response Objects)
-
-If the named type is a request or response body for a feature endpoint (`features/user/` or `features/admin/`), it belongs in the XML as a `<feature>` `<entity>` block — not as a hand-written interface.
-
-```xml
-<!-- CORRECT: define it in stencil-entities.xml -->
-<feature name="profile" area="user" native="true">
-  <entity name="NameRequest">
-    <field type="string">display_name</field>
-  </entity>
-  <mutation name="nameUpdate" route="v1/profile/name" request="params" requestType="NameRequest" itemResult="Account.Self" />
-</feature>
-```
-
-The generator will produce the typed interface and `Sanitize.for()` registry class. The controller imports and uses the generated types:
-
-```typescript
-// CORRECT: use generated types from XML
-import { INameRequest, NameRequest } from './models/namerequest';
-@Body(Sanitize.for(NameRequest)) input: INameRequest
-```
-
-Hand-writing a DTO interface for a feature endpoint bypasses the sanitization registry and breaks the code generation contract. If the shape needs to change, update the XML and regenerate.
+This also forbids inline **intersections** at call sites (e.g. `SomeContract & { newMethod?: ... }`). Adding optional methods to a contract at the call site bypasses `implements`-clause checking — see `interface-contract-integrity.mdc`.

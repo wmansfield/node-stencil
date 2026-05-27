@@ -7,7 +7,7 @@ import { getSanitizedValidators } from 'src/shared/utils/sanitized.registry';
  * - `[Function]`  → array of nested objects: validate each element
  *
  * Example:
- *   { combination: Combination, shared_with: [Account.Connection] }
+ *   { avatar: MediaInfo, roles: [string] }
  */
 export type NestedTypeMap = Record<string, Function | [Function]>;
 

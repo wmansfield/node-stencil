@@ -1,0 +1,35 @@
+---
+description: Require braces on all control flow statements (if, else, for, while)
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# Braces Required on Control Flow
+
+All `if`, `else`, `for`, and `while` statements must use braces, even for single-line bodies. Braceless inline forms are not allowed.
+
+## Prohibited
+
+```typescript
+if (hadSubmitted) inc.submission_count = -1;
+
+if (condition) return;
+
+for (const item of items) doSomething(item);
+```
+
+## Required
+
+```typescript
+if (hadSubmitted) {
+   inc.submission_count = -1;
+}
+
+if (condition) {
+   return;
+}
+
+for (const item of items) {
+   doSomething(item);
+}
+```

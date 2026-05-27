@@ -41,7 +41,6 @@ type FormType = {
    duration_secs?: IJurisdictionAsset["duration_secs"];
    dependency?: IJurisdictionAsset["dependency"] | undefined ;
    account_id_creator?: IJurisdictionAsset["account_id_creator"];
-   capsule_id?: IJurisdictionAsset["capsule_id"];
    dependency_id?: IJurisdictionAsset["dependency_id"];
    available: IJurisdictionAsset["available"];
    resize_required: IJurisdictionAsset["resize_required"];
@@ -70,7 +69,6 @@ const schema = z.object({
          message: 'Dependencies is required',
       }).optional(),
    account_id_creator: z.string().optional(),
-   capsule_id: z.string().optional(),
    dependency_id: z.string().optional(),
    available: z.boolean(),
    resize_required: z.boolean(),
@@ -112,7 +110,6 @@ function JurisdictionAssetEditor(props: JurisdictionAssetEditorProps) {
 		duration_secs: undefined,
 		dependency: undefined,
 		account_id_creator: undefined,
-		capsule_id: undefined,
 		dependency_id: undefined,
 		available: false,
 		resize_required: false,
@@ -495,27 +492,6 @@ function JurisdictionAssetEditor(props: JurisdictionAssetEditorProps) {
                                     {...field}
                                     className="mb-2"
                                     id="account_id_creator"
-                                 />
-                              )}
-                           />
-                           
-                        </FormItem>
-                        
-                     
-                        <FormItem
-                           label="Capsule ID"
-                           invalid={Boolean(errors.capsule_id)}
-                           errorMessage={errors.capsule_id?.message}
-                        >
-                           
-                           <Controller
-                              name="capsule_id"
-                              control={control}
-                              render={({ field }) => (
-                                 <Input
-                                    {...field}
-                                    className="mb-2"
-                                    id="capsule_id"
                                  />
                               )}
                            />

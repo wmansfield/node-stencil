@@ -22,20 +22,26 @@ alwaysApply: true
 - `*.controller.base.ts`
 - `*.sanitized.validators.ts` (when part of entity generation)
 - `list-input-*.ts`
+- `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts`
+- Generated frontend/API model stubs (`frontend/src/stencil/**/models/**`, `frontend/src/stencil/**/endpoints/**`)
 - App layer entity models in `app/src/cloud/models/entities/` (when generated)
 
 ## Safe to Edit (ENSUREFILE or hand-written)
 
 - `*.manager.ts` — extension with custom methods
 - `*.controller.ts` — extension with custom endpoints
-- `*.module.ts`
+- Entity-specific `*.module.ts` only when confirmed as ENSUREFILE/custom; generated aggregators are STARTFILE
 - Feature request models in `backend/src/features/**/models/` — **check if generated**; feature entities may be generated from XML
+
+## Reserved System Fields
+
+`created_utc` and `updated_utc` are reserved system fields — the generator adds them automatically to every document entity. Never define these as business fields in XML. If domain-specific timestamps are needed, use distinct names (e.g. `generated_utc`, `edited_utc`, `invited_utc`).
 
 ## Adding a New Entity
 
 1. Add `<item>` with `<field>` elements to XML
 2. Run generator
-3. Register in `entity.module.ts` and `entity.registry.ts`
+3. Confirm generated `entity.module.ts` and `entity.registry.ts` include it
 4. Add custom logic in `{entity}.manager.ts`
 
 ## Adding a Field to Existing Entity
