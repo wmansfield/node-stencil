@@ -1,0 +1,44 @@
+{
+   "version": "2.0.0",
+   "tasks": [
+      {
+         "type": "npm",
+         "script": "start:debug",
+         "path": "api/backend/",
+         "group": {
+            "kind": "build",
+            "isDefault": true
+         },
+         "label": "npm: start:debug",
+         "detail": "nest start --debug --watch",
+         "problemMatcher": {
+            "owner": "typescript",
+            "pattern": "$tsc",
+            "background": {
+               "activeOnStart": true,
+               "beginsPattern": ".",
+               "endsPattern": "Nest application successfully started"
+            }
+         },
+         "isBackground": true,
+         "presentation": {
+            "reveal": "always",
+            "panel": "new"
+         }
+      },
+      {
+         "label": "Wait for Debugger",
+         "type": "shell",
+         "command": "timeout /t 5",
+         "windows": {
+            "command": "timeout /t 5"
+         },
+         "linux": {
+            "command": "sleep 5"
+         },
+         "osx": {
+            "command": "sleep 5"
+         }
+      }
+   ]
+}

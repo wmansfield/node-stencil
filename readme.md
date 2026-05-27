@@ -136,19 +136,43 @@ See [`server/api/developers/README.md`](./server/api/developers/README.md) for t
 
 ## Getting Started
 
+### Code generator (one-time)
+
+The generator executables are not in source control. After cloning, build them once with the [.NET 8 SDK](https://dotnet.microsoft.com/download) (Windows):
+
+```powershell
+cd server/generation/tools/src
+.\build_contained.ps1    # self-contained (~50–200 MB each); or build_framework.ps1 if .NET 8 runtime is installed
+```
+
+This writes `code-generator.exe` and `code-generator-cli.exe` to `server/generation/tools/`. Re-run after pulling generator source changes.
+
+### API and frontend
+
 ```bash
 cd server/api
 
 # Install dependencies
 npm run install:all
 
-# Configure environment
-cp backend/.env.sample backend/.env
-cp frontend/.env.sample frontend/.env
+# Configure environment — copy examples, then edit as needed
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 
 # Start frontend (localhost:3000) + backend (localhost:3001)
 npm start
 ```
+
+`frontend/.env.example` sets `VITE_API_BASE_URL=http://localhost:3001/api` for local dev. Leave all `VITE_FIREBASE_*` values empty unless you are using SSO (must match backend Firebase config). Set `VITE_ADMIN_GATE_TOKEN` only if `ADMIN_GATE_TOKEN` is set on the backend.
+
+**Sign in without SSO** — leave Firebase unset in `backend/.env` and `frontend/.env` (no `FIREBASE_PROJECT_ID` / `VITE_FIREBASE_*`). The app uses local auth; sign in at http://localhost:3000 with:
+
+| Field | Default |
+|-------|---------|
+| Username | `dev` |
+| Password | `dev-secret` |
+
+Override via `DEV_AUTH_USER` and `DEV_AUTH_PASS` in `backend/.env`. With Firebase configured, the sign-in page shows **Sign in with SSO** instead.
 
 To test full federation locally with four isolated instances:
 

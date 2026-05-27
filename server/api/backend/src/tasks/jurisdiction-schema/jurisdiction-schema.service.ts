@@ -4,8 +4,8 @@ import { EntityRegistry } from 'src/entities/entity.registry';
 import { JurisdictionSchemaVersion } from 'src/entities/enums/jurisdictionschemaversion';
 import { MongoConnectionProvider } from 'src/shared/mongo/mongo-connection.provider';
 import { MAX_INT_32 } from 'src/shared/constants/int';
-import { upgradeTo_v2025_04_28 } from './jurisdictions/schema-2025-04-28';
-import { upgradeTo_v2025_04_29 } from './jurisdictions/schema-2025-04-29';
+import { upgradeTo_v2026_05_26 } from './jurisdictions/schema-2026-05-26';
+import { upgradeTo_v2026_05_27 } from './jurisdictions/schema-2026-05-27';
 
 type JurisdictionUpgrade = {
    version_to_upgrade: JurisdictionSchemaVersion;
@@ -50,16 +50,17 @@ export class JurisdictionSchemaService {
       try {
          this.logger.log('Jurisdiction Upgrades Starting.');
 
+         // The first two of these are demonstrative, they can be removed once you have real ones.
          const upgrades: JurisdictionUpgrade[] = [
             {
                version_to_upgrade: JurisdictionSchemaVersion.unknown,
-               upgrade_method: upgradeTo_v2025_04_28,
-               version_after: JurisdictionSchemaVersion.v2025_04_28,
+               upgrade_method: upgradeTo_v2026_05_26,
+               version_after: JurisdictionSchemaVersion.v2026_05_26,
             },
             {
-               version_to_upgrade: JurisdictionSchemaVersion.v2025_04_28,
-               upgrade_method: upgradeTo_v2025_04_29,
-               version_after: JurisdictionSchemaVersion.v2025_04_29,
+               version_to_upgrade: JurisdictionSchemaVersion.v2026_05_26,
+               upgrade_method: upgradeTo_v2026_05_27,
+               version_after: JurisdictionSchemaVersion.v2026_05_27,
             },
          ];
 

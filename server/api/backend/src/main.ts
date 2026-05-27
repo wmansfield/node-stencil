@@ -6,12 +6,9 @@ import { FriendlyExceptionFilter } from './shared/exceptions/friendly-exception.
 import { ConsoleLogger, ValidationPipe } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
-import { initSodium } from './shared/crypto/sodium';
 import { DateTransformInterceptor } from './shared/interceptors/date-transform.interceptor';
 
 async function bootstrap() {
-   await initSodium(); // <-- ensures sodium is ready
-
    const isProduction = process.env.NODE_ENV === 'production';
 
    if (isProduction) {

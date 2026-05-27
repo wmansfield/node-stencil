@@ -13,7 +13,7 @@ import { Button, Checkbox, DatePicker, Dialog, Form, FormItem, Input } from '@/c
 import NullableCheckbox from '@/views/super/common/NullableCheckbox';
 
 import JurisdictionPicker from '@/views/super/pickers/JurisdictionPicker';
-import AssetPicker from '@/views/super/pickers/JurisdictionAssetPicker';
+import JurisdictionAssetPicker from '@/views/super/pickers/JurisdictionAssetPicker';
 import LocalizedText from '@/stencil/models/entities/localizedtext';
 import LocalizedTextEditor, { localizedTextSchema } from '../localizedtext/LocalizedTextEditor';
 import LocalizedTextListEditor from '../localizedtext/LocalizedTextListEditor';

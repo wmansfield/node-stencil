@@ -6,7 +6,7 @@ setlocal enabledelayedexpansion
 
 set CONFIGURATION=Release
 set RUNTIME=win-x64
-set OUTPUTDIR=.\publish
+set OUTPUTDIR=..
 
 if not "%1"=="" set CONFIGURATION=%1
 if not "%2"=="" set RUNTIME=%2

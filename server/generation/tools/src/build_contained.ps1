@@ -4,7 +4,7 @@
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$OutputDir = ".\publish"
+    [string]$OutputDir = ".."
 )
 
 Write-Host "CodeGenerator Build Script" -ForegroundColor Green
@@ -67,5 +67,5 @@ Write-Host "  GUI: $OutputDir\code-generator.exe" -ForegroundColor Gray
 Write-Host "  CLI: $OutputDir\code-generator-cli.exe" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Usage:" -ForegroundColor Yellow
-Write-Host "  GUI: .\publish\code-generator.exe [dataFile]" -ForegroundColor Gray
-Write-Host "  CLI: .\publish\code-generator-cli.exe [dataFile] [outputFolder] [template1] [template2] ..." -ForegroundColor Gray 
+Write-Host "  GUI: ..\code-generator.exe [dataFile]" -ForegroundColor Gray
+Write-Host "  CLI: ..\code-generator-cli.exe [dataFile] [outputFolder] [template1] [template2] ..." -ForegroundColor Gray 

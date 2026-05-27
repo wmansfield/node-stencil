@@ -11,8 +11,8 @@ import { getAllSchemas } from '../managers/schema-registry';
  * skipped — the XML `encrypted` attribute has been removed for this template,
  * so no schema metadata requests it.
  *
- * This provider is selected automatically when the `MONGO_URI` environment
- * variable is absent (see MongoModule). It is never used in production.
+ * This provider is selected automatically when the SHARED tenant has no Mongo URI
+ * (see ConfigResolver.usesInMemoryMongo and MongoModule). It is never used in production.
  *
  * `mongodb-memory-server` is a devDependency and is loaded via dynamic import
  * so that a production bundle that tree-shakes unused code never pulls it in.

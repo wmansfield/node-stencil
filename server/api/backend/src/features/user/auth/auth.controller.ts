@@ -14,6 +14,9 @@ import { Sanitize } from 'src/shared/utils/sanitized';
 import { isNullOrWhiteSpace } from 'src/shared/utils';
 import { StorageUtils } from 'src/features/utils/storage.utils';
 import { CloudStorageHandler } from 'src/features/platform/storage';
+import { GlobalAccount } from 'src/entities/globalaccount/globalaccount.model';
+import { SHARED_TENANT_CODE } from 'src/shared/constants/tenants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('v1/auth')
 export class AuthController {
@@ -145,12 +148,15 @@ export class AuthController {
     *
     * Credentials are validated against DEV_AUTH_USER / DEV_AUTH_PASS env vars
     * (defaults: "dev" / "dev-secret").
+    *
+    * When a jurisdiction is available (body.jurisdiction or the first entry in
+    * FEDERATION_JURISDICTION), the account is auto-created with the admin role.
     */
    @RateLimit({ points: 10, duration: 60 })
    @UseGuards(RateLimitGuard)
    @Post('dev-token')
    @HttpCode(200)
-   async devToken(@Body() body: { username?: string; password?: string; sub?: string; email?: string }) {
+   async devToken(@Body() body: { username?: string; password?: string; sub?: string; email?: string; jurisdiction?: string }) {
       if (!(this.authProvider instanceof LocalAuthProvider)) {
          throw new NotFoundException();
       }
@@ -164,9 +170,66 @@ export class AuthController {
 
       const sub = body.sub ?? body.username;
       const email = body.email ?? `${sub}@dev.local`;
+      const jurisdictionId = body.jurisdiction?.trim() || this.resolveDefaultDevJurisdiction();
+      if (jurisdictionId) {
+         await this.ensureLocalDevAccount(sub!, email, jurisdictionId);
+      } else {
+         this.logger.warn('Dev token issued without jurisdiction — account will be created on /register');
+      }
       const token = await this.authProvider.mintToken(sub!, email);
 
       return { token };
+   }
+
+   private resolveDefaultDevJurisdiction(): string | undefined {
+      return process.env.FEDERATION_JURISDICTION
+         ?.split(',')
+         .map(j => j.trim())
+         .find(j => j.length > 0 && j.toUpperCase() !== SHARED_TENANT_CODE);
+   }
+
+   private async ensureLocalDevAccount(sub: string, email: string, jurisdictionId: string, displayName?: string): Promise<void> {
+      let globalAccount = await this.entities.globalAccountManager.getForAuthIdentifier(sub);
+      if (!globalAccount) {
+         globalAccount = await this.entities.globalAccountManager.insert(
+            new GlobalAccount({
+               _id: uuidv4(),
+               auth_identifier: sub,
+               jurisdiction_id: jurisdictionId,
+            })
+         );
+      }
+
+      const existing = await this.entities.accountManager.getForAuthIdentifier(jurisdictionId, sub);
+      if (existing) {
+         if (!existing.roles?.includes('admin')) {
+            const permissions = existing.asPermissionsPerspective();
+            permissions.roles = [...(existing.roles ?? []), 'admin'];
+            await this.entities.accountManager.updatePermissionsPerspective(permissions);
+         }
+         return;
+      }
+
+      const insert = new Account({
+         _id: globalAccount._id,
+         auth_identifier: sub,
+         jurisdiction_id: jurisdictionId,
+         email,
+         account_status: AccountStatus.enabled,
+         display_name: displayName ?? sub,
+         email_upper: email.toUpperCase(),
+         joined_utc: new Date(),
+         auth_provider: 'local',
+         roles: ['admin'],
+      });
+
+      try {
+         await this.entities.accountManager.insert(jurisdictionId, insert);
+      } catch (error: any) {
+         if (!(error?.code === 11000 || error?.message?.includes('duplicate key'))) {
+            throw error;
+         }
+      }
    }
 
    private async createAccount(request: StencilRequest, input: IRegisterRequest): Promise<Account> {
@@ -190,6 +253,7 @@ export class AuthController {
          email_upper: jwt.email?.toUpperCase() || '',
          joined_utc: new Date(),
          auth_provider: jwt.auth_provider ?? 'password',
+         roles: this.authProvider instanceof LocalAuthProvider ? ['admin'] : undefined,
       });
 
       try {

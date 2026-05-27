@@ -102,8 +102,11 @@ build_framework.bat
 ```
 
 ### Output
-- **GUI**: `publish/code-generator.exe`
-- **CLI**: `publish/code-generator-cli.exe`
+
+Build scripts run from `src/` and publish executables to the parent `tools/` folder:
+
+- **GUI**: `../code-generator.exe` (i.e. `server/generation/tools/code-generator.exe`)
+- **CLI**: `../code-generator-cli.exe`
 
 **Self-Contained Builds**: Complete standalone executables (50-200MB) that include the .NET runtime.
 **Framework-Dependent Builds**: Smaller executables (50-200KB) that require .NET 8 Runtime to be installed on the target machine.

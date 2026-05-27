@@ -56,7 +56,6 @@
       "helmet": "^8.1.0",
       "ioredis": "^5.9.3",
       "jose": "^4.15.9",
-      "libsodium-wrappers": "^0.8.2",
       "lodash": "^4.17.23",
       "mongodb-client-encryption": "^7.0.0",
       "mongoose": "^9.2.1",

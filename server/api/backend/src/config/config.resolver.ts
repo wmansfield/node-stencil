@@ -6,6 +6,7 @@ import { TenantConfig } from './config.types';
 import { ConfigTemplates } from './config.templates';
 import { INTERNAL_AUTHORITY, KMS_AWS, KMS_AZURE } from 'src/shared/shared.constants';
 import { AwsSecretsConfigSource } from './config.source.aws';
+import { SHARED_TENANT_CODE } from 'src/shared/constants/tenants';
 
 @Injectable()
 export class ConfigResolver {
@@ -89,6 +90,27 @@ export class ConfigResolver {
       return undefined;
    }
 
+   private async resolveTenantSpecificSource(tenant_code: string): Promise<string | undefined> {
+      const authority = await this.getValue(ConfigTemplates.Authority(tenant_code), undefined);
+      if (authority && authority != INTERNAL_AUTHORITY) {
+         await this.ensureAuthority(authority);
+         return authority;
+      }
+      return undefined;
+   }
+
+   /** Resolves a tenant Mongo URI from configured sources (env, vault, secrets). */
+   async getTenantMongoUri(tenant_code: string): Promise<string | undefined> {
+      const specificSource = await this.resolveTenantSpecificSource(tenant_code);
+      const uri = await this.getValue(ConfigTemplates.MongoUri(tenant_code), specificSource);
+      return uri?.trim() || undefined;
+   }
+
+   /** True when the SHARED tenant has no real Mongo URI — in-memory Mongo is used instead. */
+   async usesInMemoryMongo(): Promise<boolean> {
+      return !(await this.getTenantMongoUri(SHARED_TENANT_CODE));
+   }
+
    async getTenantConfig(tenant_code: string): Promise<TenantConfig> {
       const key = `${tenant_code}`;
       let config = this.tenants.get(key);
@@ -97,23 +119,20 @@ export class ConfigResolver {
 
          config = {
             tenant_code: tenant_code,
-            mongo: undefined!, // filling below
             attempted: true,
          };
 
-         let specificSource = undefined;
-         const authority = await this.getValue(ConfigTemplates.Authority(tenant_code), undefined);
-         if (authority && authority != INTERNAL_AUTHORITY) {
-            // using a different authority, reduce configuration sources to only that authority (BYOK)
-            await this.ensureAuthority(authority);
-            specificSource = authority;
-         }
+         const specificSource = await this.resolveTenantSpecificSource(tenant_code);
 
          // attempt mongo config
          const database = await this.getValue(ConfigTemplates.MongoDatabase(tenant_code), specificSource);
-         const uri = await this.getValue(ConfigTemplates.MongoUri(tenant_code), specificSource);
+         const uri = await this.getTenantMongoUri(tenant_code);
          const maxPoolSize = await this.getValue(ConfigTemplates.MongoMaxPoolSize(tenant_code), specificSource);
          const minPoolSize = await this.getValue(ConfigTemplates.MongoMinPoolSize(tenant_code), specificSource);
+
+         if (uri && !database) {
+            throw new Error(`Mongo URI configured but database missing for tenant: ${key}`);
+         }
 
          if (database && uri) {
             config.mongo = {
@@ -175,6 +194,9 @@ export class ConfigResolver {
          this.tenants.set(key, config);
       }
       if (config?.mongo) {
+         return config;
+      }
+      if (key.toUpperCase() === SHARED_TENANT_CODE) {
          return config;
       }
       throw new Error(`No configuration found for tenant: ${key}`);

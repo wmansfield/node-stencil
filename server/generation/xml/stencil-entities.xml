@@ -161,7 +161,7 @@
   <item name="Account" friendlyName="Account" tenant="Isolated" useDocument="true" uiDetail="true" uiDisplayField="display_name">
     <field type="Uuid" isNullable="false" friendlyName="Id">_id</field>
     <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
-    <field type="Uuid" isNullable="true" perspective="Info" foreignKey="Asset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Avatar">asset_id_avatar</field>
+    <field type="Uuid" isNullable="true" perspective="Info" foreignKey="JurisdictionAsset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Avatar">asset_id_avatar</field>
     <field type="string" isNullable="false" perspective="Status" maxLength="128" validate="email" uiList="true" searchable="true" sortable="true" recalculate="true" friendlyName="E-mail">email</field>
     <field type="string" isNullable="true" perspective="Info" maxLength="150" searchable="true" sortable="true" uiList="true" friendlyName="Display Name">display_name</field>
     <field type="string" isNullable="false" maxLength="150" uiList="true" searchable="true" friendlyName="Auth Identifier">auth_identifier</field>
@@ -211,7 +211,7 @@
   <item name="Widget" friendlyName="Widget" tenant="Isolated" useDocument="true" uiDetail="true" uiDisplayField="title">
     <field type="Uuid" isNullable="false" friendlyName="Id">_id</field>
     <field type="string" isNullable="false" maxLength="10" tenant="true" foreignKey="Jurisdiction" foreignKeyField="_id" uiParent="true" friendlyName="Jurisdiction">jurisdiction_id</field>
-    <field type="Uuid" isNullable="true" foreignKey="Asset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Media Asset">asset_id_media</field>
+    <field type="Uuid" isNullable="true" foreignKey="JurisdictionAsset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Media Asset">asset_id_media</field>
     <field type="string" isNullable="false" maxLength="200" uiList="true" searchable="true" sortable="true" friendlyName="Title">title</field>
     <field type="LocalizedText[]" isNullable="true" perspective="Config" isClass="true" recalculate="true" friendlyName="Title Localized">title_localized</field>
     <field type="string" isNullable="true" maxLength="none" perspective="Config" searchable="true" friendlyName="Description">description</field>
@@ -243,6 +243,11 @@
     <field value="2">header</field>
     <field value="3">image</field>
     <field value="4">button</field>
+  </enum>
+  <enum name="JurisdictionSchemaVersion">
+    <field value="0">unknown</field>
+    <field value="1">v2026_05_26</field>
+    <field value="2" current="true">v2026_05_27</field>
   </enum>
   <feature name="auth" area="user" native="true">
     <entity name="Account.Self" isItem="true"/>

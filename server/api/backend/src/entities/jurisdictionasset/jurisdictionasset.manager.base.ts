@@ -206,13 +206,17 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
 
    
 
-   async delete(document: JurisdictionAsset): Promise<boolean> {
+   async delete(document: JurisdictionAsset, force: boolean = false): Promise<boolean> {
       await this.preProcessMutationDocument(document, DocumentOperation.delete);
       
       // Get Server version
       const actual = await this.getById(document.jurisdiction_id, document._id);
       if (actual == undefined) {
          return true;
+      }
+      
+      if (!force){
+         await this.validateNoReferences(actual.jurisdiction_id, actual._id);
       }
       
       const result = await this._deleteIsolated(actual.jurisdiction_id, actual._id);
@@ -590,6 +594,24 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
          throw new UIException(LocalizableString.General_FieldMaxLength(512, "jurisdictionasset.thumb_large_key"));
       }
       
+   }
+   
+   async validateNoReferences(jurisdiction_id: string, _id : string, skip_entities?: string[]) : Promise<void> {
+      
+      let hasReference = false;
+      
+      if (!skip_entities || skip_entities.length == 0 || !skip_entities.includes('Account')){
+         hasReference = await this.entities.accountManager.anyWithAvatar(jurisdiction_id, _id);
+         if (hasReference) {
+            throw new UIException(LocalizableString.General_ReferenceInUse('Account'));
+         }
+      }
+      if (!skip_entities || skip_entities.length == 0 || !skip_entities.includes('Widget')){
+         hasReference = await this.entities.widgetManager.anyWithMediaAsset(jurisdiction_id, _id);
+         if (hasReference) {
+            throw new UIException(LocalizableString.General_ReferenceInUse('Widget'));
+         }
+      }
    }
    
    protected async calculateSearchable(document: JurisdictionAsset) : Promise<void> {

@@ -134,4 +134,51 @@ describe('ConfigResolver', () => {
 
       await expect(resolver.getTenantConfig('alpha')).rejects.toThrow('Provided KMS is requested but is missing configuration: alpha, provider: aws');
    });
+
+   it('should return SHARED tenant config without mongo in sample environment', async () => {
+      const sampleSource: IConfigSource = {
+         name: 'env',
+         getValue: jest.fn(async (key: string) => {
+            if (key === 'SHARED_MONGO_DATABASE') return 'Shared';
+            return undefined;
+         }),
+      };
+
+      resolver.reset();
+      (resolver as any).sources.set(sampleSource.name, sampleSource);
+      (resolver as any).defaultSources.push(sampleSource);
+      (resolver as any).initialized = true;
+
+      expect(await resolver.usesInMemoryMongo()).toBe(true);
+
+      const config = await resolver.getTenantConfig('SHARED');
+      expect(config.tenant_code).toBe('SHARED');
+      expect(config.mongo).toBeUndefined();
+   });
+
+   it('should use real mongo when SHARED tenant URI is configured', async () => {
+      const prodSource: IConfigSource = {
+         name: 'env',
+         getValue: jest.fn(async (key: string) => {
+            if (key === 'SHARED_KMS_PROVIDER') return 'aws';
+            if (key === 'SHARED_MONGO_URI') return 'mongodb://shared-uri';
+            if (key === 'SHARED_MONGO_DATABASE') return 'Shared';
+            if (key === 'SHARED_AWS_ACCESS_KEY_ID') return 'shared-key-id';
+            if (key === 'SHARED_AWS_ACCESS_KEY_SECRET') return 'shared-key-secret';
+            if (key === 'SHARED_AWS_KMS_ARN') return 'shared-fake-path';
+            if (key === 'SHARED_AWS_KMS_REGION') return 'shared-us-east-x';
+            return undefined;
+         }),
+      };
+
+      resolver.reset();
+      (resolver as any).sources.set(prodSource.name, prodSource);
+      (resolver as any).defaultSources.push(prodSource);
+      (resolver as any).initialized = true;
+
+      expect(await resolver.usesInMemoryMongo()).toBe(false);
+
+      const config = await resolver.getTenantConfig('SHARED');
+      expect(config.mongo?.uri).toBe('mongodb://shared-uri');
+   });
 });

@@ -27,8 +27,8 @@ function JurisdictionSchemaVersionPickerMulti(props: JurisdictionSchemaVersionPi
 
    const jurisdictionschemaversions: Option[] = [
       { value: '0', display: 'unknown' },
-      { value: '1', display: 'v2025_04_28' },
-      { value: '2', display: 'v2025_04_29' },
+      { value: '1', display: 'v2026_05_26' },
+      { value: '2', display: 'v2026_05_27' },
    ];
 
    if (null_display && null_display.length > 0) {

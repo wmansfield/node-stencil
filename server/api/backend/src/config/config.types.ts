@@ -30,6 +30,6 @@ export interface KMSAzureConfig {
 
 export interface TenantConfig {
    tenant_code: string;
-   mongo: MongoConfig;
+   mongo?: MongoConfig;
    attempted: boolean;
 }

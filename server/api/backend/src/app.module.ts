@@ -20,6 +20,7 @@ import { UserModule } from './features/user/user.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { JurisdictionMismatchInterceptor } from './shared/interceptors/jurisdiction-mismatch.interceptor';
 import { HttpMetricsInterceptor } from './shared/interceptors/http-metrics.interceptor';
+import { BootstrapModule } from './features/platform/bootstrap/bootstrap.module';
 
 @Module({
    imports: [
@@ -41,6 +42,7 @@ import { HttpMetricsInterceptor } from './shared/interceptors/http-metrics.inter
       StorageModule,
       CacheModule,
       UserModule,
+      BootstrapModule
    ],
    providers: [
       AppConfigModule,
@@ -65,10 +67,11 @@ export class AppModule implements OnApplicationShutdown, NestModule {
       consumer
          .apply(JurisdictionMiddleware, JwtAuthMiddleware)
          .exclude(
-            'platform/bootstrap/{*splat}',
+            'platform/bootstrap',
             'platform/health',
             'health',
             'metrics',
+            'v1/auth/dev-token',
          )
          .forRoutes('{*splat}');
    }

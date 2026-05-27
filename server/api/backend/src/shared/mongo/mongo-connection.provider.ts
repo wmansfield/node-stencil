@@ -54,8 +54,8 @@ export class MongoConnectionProvider {
       this.logger.log(`Creating connection for ${tenant_code}`);
 
       const config = await this.configResolver.getTenantConfig(tenant_code);
-      if (!config) {
-         throw new Error(`No configuration found for tenant: ${tenant_code}`);
+      if (!config?.mongo) {
+         throw new Error(`No MongoDB configuration for tenant: ${tenant_code}`);
       }
 
       // Get or create encryption keys

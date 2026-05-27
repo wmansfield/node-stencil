@@ -42,6 +42,18 @@ cp frontend/.env.sample frontend/.env
 npm start
 ```
 
+### Seed the database (local sample environment)
+
+Before logging in for the first time, seed reference data (roles, timezones, jurisdictions):
+
+```bash
+curl http://localhost:3001/api/platform/bootstrap
+```
+
+Or open [http://localhost:3001/api/platform/bootstrap](http://localhost:3001/api/platform/bootstrap) in a browser.
+
+This endpoint is idempotent — it returns `{ "status": "already_bootstrapped" }` on subsequent calls. It is only available when `NODE_ENV` is not `production` and requires no authentication.
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:3001
 - API prefix: `/api`
