@@ -281,3 +281,12 @@ Features define API endpoints for the mobile app:
 1. Add `<projection>` inside `<item>`
 2. Run generator
 3. Use `Entity.ProjectionName` type in code
+
+### Calculated Fields & Computed References
+
+Use `calculated="self"` / `calculated="other"`, `recalculate="true"`, and the
+`applyCalculations` manager hook to add computed fields — including a **computed
+reference** (a projection of a foreign entity stored inline so the UI gets clear,
+searchable data instead of a bare FK id, e.g. `Target.customer: Customer.Reference`).
+
+See `ai/patterns/calculated-fields-and-references.md` for the full pattern.

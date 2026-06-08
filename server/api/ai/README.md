@@ -40,6 +40,8 @@ The codebase uses code generation. The workflow is:
 | `patterns/features-api.md` | Working with native app API endpoints |
 | `patterns/feature-controllers.md` | Implementing or reviewing feature controllers |
 | `patterns/federation-and-dual-homed.md` | Working with dual-homed entities, federation, sync, or tombstones |
+| `patterns/calculated-fields-and-references.md` | Adding computed fields or computed references (projection of a foreign entity) |
+| `patterns/webhook-ingestion.md` | Consuming inbound webhooks (queue + scheduled/manual processor) |
 | `verification.md` | Checking invariants and test expectations before finishing |
 
 ## Cursor Rules
