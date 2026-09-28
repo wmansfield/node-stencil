@@ -5,6 +5,7 @@ import { StorageModule } from '../platform/storage';
 import { AuthController } from './auth/auth.controller';
 import { MediaController } from './media/media.controller';
 import { ProfileController } from './profile/profile.controller';
+import { WidgetsController } from './widget/widget.controller';
 
 @Module({
    imports: [AppConfigModule, EntitiesModule, StorageModule],
@@ -12,6 +13,7 @@ import { ProfileController } from './profile/profile.controller';
       AuthController,
       MediaController,
       ProfileController,
+      WidgetsController,
    ],
 })
 export class UserModule {}

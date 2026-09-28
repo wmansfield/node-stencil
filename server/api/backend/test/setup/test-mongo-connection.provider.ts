@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Connection, ConnectOptions, createConnection } from 'mongoose';
 import { Mutex } from 'async-mutex';
+import * as os from 'os';
 import { getAllSchemas } from 'src/shared/managers/schema-registry';
 
 interface ConnectionInfo {
@@ -58,6 +59,9 @@ export class TestMongoConnectionProvider {
          dbName,
          maxPoolSize: 5,
          minPoolSize: 1,
+         // The driver otherwise loads its os adapter with a dynamic import(), which Jest's CommonJS
+         // runtime rejects; the failure is swallowed and the server refuses the empty handshake metadata.
+         runtimeAdapters: { os },
       };
 
       const conn = await createConnection(this.uri, options).asPromise();

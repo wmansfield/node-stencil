@@ -83,6 +83,10 @@ export const AdminPermissions = {
       Widget: {
          Read: 'admin:widget:read',
          Write: 'admin:widget:write',
+         Public: {
+            Read: 'admin:widget.public:read',
+         },
+         
          Config: {
             Write: 'admin:widget.config:write',
          },

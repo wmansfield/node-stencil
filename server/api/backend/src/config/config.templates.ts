@@ -74,4 +74,10 @@ export const ConfigTemplates = {
    // Public URLs
    PublicApiBaseUrl: () => 'PUBLIC_API_BASE_URL',
    PublicWebBaseUrl: () => 'PUBLIC_WEB_BASE_URL',
+
+   // MCP endpoint (served to an MCP gateway)
+   McpResourceUrl: () => 'MCP_RESOURCE_URL',
+   McpGatewayToken: () => 'MCP_GATEWAY_TOKEN',
+   McpAllowedOrigins: () => 'MCP_ALLOWED_ORIGINS',
+   McpIdentityIssuer: () => 'MCP_IDENTITY_ISSUER',
 };

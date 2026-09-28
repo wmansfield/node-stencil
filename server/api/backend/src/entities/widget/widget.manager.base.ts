@@ -71,6 +71,11 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
       return result;
    }
    
+   async getByIdPublic(jurisdiction_id: string, _id:string) : Promise<Widget.Public | undefined> {
+      const result = await this._retrieveIsolated<Widget.Public>(Widget.Public, jurisdiction_id, _id, Widget.Public.Projection);
+      return result;
+   }
+   
 
    async getWithin<TProjection>(
       ctor: new (...args: any[]) => TProjection, 
@@ -262,14 +267,11 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
       
       await this.validateConfigPerspective(perspective);
       
-      await this.calculateSearchable(actual);
-      
       actual.calculationMarkDirty(this.defaultAgent, "update_ConfigPerspective");
       const filter = { _id: perspective._id };
       const update: UpdateQuery<Widget>  = {
          $set: {
             updated_utc: new Date(),
-            searchable: actual.searchable,
             title_localized: perspective.title_localized,
             description: perspective.description,
             description_localized: perspective.description_localized
@@ -425,7 +427,7 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
    protected applySafeSort(sorts:SortInfo[]) : [string, SortOrder][] {
       const result: [string, SortOrder][] = [];
 
-      const allowedFields = ['title', 'description'];
+      const allowedFields = ['title'];
       
       for (const item of sorts) {
          if (!isNullOrWhiteSpace(item.field)) {
@@ -447,7 +449,6 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
    
    protected async sanitizeConfigPerspective(perspective:Widget.ConfigPerspective) {
       
-      perspective.description = sanitizeHtml(perspective.description, false);
    }
    
 
@@ -486,9 +487,6 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
       
       if (!isNullOrWhiteSpace(document.title)) {
          document.searchable += document.title!.toLowerCase() + SEARCHABLE_DIVIDER;
-      }
-      if (!isNullOrWhiteSpace(document.description)) {
-         document.searchable += document.description!.toLowerCase() + SEARCHABLE_DIVIDER;
       }
    }
    

@@ -17,7 +17,7 @@ async list(
       throw new ForbiddenException();
    }
    const jurisdiction_id = request.account.jurisdiction_id;
-   // Use jurisdiction_id for isolated data access.
+   return this.entities.thingManager.findPublic(jurisdiction_id, 0, 100, input.keyword, 'name', false);
 }
 ```
 
@@ -28,7 +28,9 @@ async list(
 - Authenticated `/v1/*` endpoints derive jurisdiction from `request.account.jurisdiction_id`.
 - Authenticated user endpoints use `AuthGuard`, `RateLimitGuard`, and `@RateLimit(...)`.
 - Prefer typed envelopes: `ItemResult<T>`, `ListResult<T>`, or `ActionResult`.
-- Use `UIException(new LocalizableString(...))` for user-facing soft failures the client should display.
+- When the manager method already returns that envelope, return it. Do not copy `success`, `items`, `paging`, and `stepping` into a new object. Build a new envelope only when the method returns a document, or when each row is mapped to a different type.
+- Do not re-check required or max length for fields the manager `validate` already checks. Those failures are already `UIException`.
+- Use `UIException(new LocalizableString(...))` for a failure the user can correct. `BadRequestException` is for a caller bug, such as a body jurisdiction that does not match the route.
 - Webhooks usually use `Sanitize.ignore()`, header/provider authentication, internal validation, and a 200 acknowledgement shape.
 
 ## Generated Models
@@ -43,3 +45,7 @@ Feature model files under `backend/src/features/**/models/` may be generated fro
 - Body sanitization uses the generated request class.
 - Return type matches the generated response/projection.
 - New user-facing behavior has E2E coverage or a documented reason for deferral.
+
+## Localized reads
+
+Admin CRUD returns the stored default field and the `*_localized` arrays together. Copying one language onto the default field is hand-written on a feature endpoint. Load the full document (the public projection omits the arrays), clone it, assign, then return the projection. See [`localized-content.md`](./localized-content.md).

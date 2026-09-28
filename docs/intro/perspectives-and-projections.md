@@ -79,7 +79,7 @@ When two reasons both need to affect what people see, store **two fields**, one 
 
 Example: an owner sets `title_owner` (Info) and a moderator sets `title_moderator` (Moderation). A calculated `title` is the one lists show. Moving `title` into both perspectives would let the moderator’s save wipe the owner’s text.
 
-`Widget` uses the same idea for copy: `title_localized`, `description`, and `description_localized` share `perspective="Config"`. Updating the description does not rewrite the media asset or the published date.
+`Widget` uses the same idea for copy: `title_localized`, `description`, and `description_localized` share `perspective="Config"`. Updating the description does not rewrite the media asset or the published date. Choosing a language and writing it back into `title` or `description` is a separate feature-endpoint step: [Localized content](./localized-content.md).
 
 ### Replace
 

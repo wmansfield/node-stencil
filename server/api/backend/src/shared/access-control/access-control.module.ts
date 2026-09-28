@@ -7,6 +7,7 @@ import { EntityRegistryModule } from 'src/entities/entity-registry.module';
 import { AUTH_PROVIDER } from './auth-provider/auth-provider.interface';
 import { FirebaseAuthProvider } from './auth-provider/firebase-auth.provider';
 import { LocalAuthProvider } from './auth-provider/local-auth.provider';
+import { AccountResolver } from './account-resolver.service';
 import { ConfigResolver } from 'src/config/config.resolver';
 
 @Global()
@@ -16,6 +17,7 @@ import { ConfigResolver } from 'src/config/config.resolver';
       AuthGuard,
       RateLimitGuard,
       RateLimitService,
+      AccountResolver,
       {
          provide: AUTH_PROVIDER,
          useFactory: (configResolver: ConfigResolver) => {
@@ -28,6 +30,6 @@ import { ConfigResolver } from 'src/config/config.resolver';
          inject: [ConfigResolver],
       },
    ],
-   exports: [AuthGuard, RateLimitGuard, RateLimitService, AUTH_PROVIDER],
+   exports: [AuthGuard, RateLimitGuard, RateLimitService, AccountResolver, AUTH_PROVIDER],
 })
 export class AccessControlModule {}

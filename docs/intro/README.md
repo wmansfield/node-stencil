@@ -27,6 +27,7 @@ The rest of this folder is detail: how Mongo differs from SQL, how the same idea
 |------|----------|
 | [Overview](./for-everyone.md) | Workflow vocabulary: XML, files rewritten every run vs kept extensions, managers, jurisdiction, tombstones. |
 | [Perspectives and projections](./perspectives-and-projections.md) | Named reads (what a caller may see) and named writes (what an update may change). |
+| [Localized content](./localized-content.md) | Default-language fields, translation arrays, and the feature read that copies a language back into those fields. |
 | [Memory cache](./memory-cache.md) | In-process cache for hot reads: permissions, settings, account resolution, storage signatures. |
 | [Mongo is not SQL](./mongo-is-not-sql.md) | Document vs row, write-time snapshots, indexes, tenancy. |
 | [For C# developers](./for-csharp.md) | ASP.NET / SQL Server / DataLayer / stored-proc mappings. |

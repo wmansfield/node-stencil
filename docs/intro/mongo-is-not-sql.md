@@ -8,7 +8,7 @@ Stencil still has **foreign keys, unique keys, indexes, and limited atomicity**.
 
 A SQL row is flat. Related data lives in other tables and you JOIN.
 
-A Mongo **document** is a JSON-like object. Stencil XML `classOnly="true"` types (`LocalizedText`, `MediaInfo`, `FullDate`) are **embedded** on the parent. `title_localized` is an array on Widget, not a `widget_localized_text` table.
+A Mongo **document** is a JSON-like object. Stencil XML `classOnly="true"` types (`LocalizedText`, `LocalizedContent`, `MediaInfo`, `FullDate`) are **embedded** on the parent. `title_localized` and `description_localized` are arrays on Widget, not child tables. Reading one language is a feature endpoint that copies the match onto `title` / `description`; the stored arrays stay put. See [Localized content](./localized-content.md).
 
 | SQL instinct | Mongo / Stencil |
 |--------------|------------------|

@@ -75,6 +75,10 @@ Features define typed API contracts in XML. They generate request/response model
 
 Same attributes as query, but defaults to POST.
 
+## MCP Tools
+
+Add an `<mcp>` child to a `<query>` or `<mutation>` to expose it as an MCP tool. Operations without one are not reachable over MCP. The attribute contract, validation rules, and generated files are in `code-generation.md` ("MCP tools"). Give request fields a `friendlyName` and `description`; they become the tool's argument documentation.
+
 ## Authentication Attributes
 
 ```xml
@@ -173,6 +177,8 @@ export class ProfileController {
 ```
 
 The backend feature controllers are NOT generated - they're manually implemented using the generated types.
+
+Language resolution is one of those hand-written steps. Widget `get` (`v1/widgets/get`) copies a requested language onto `title` and `description` and returns `Widget.Public`. Generated widget CRUD does not. See [`localized-content.md`](./localized-content.md).
 
 For controller rules, read `feature-controllers.md`. The short version:
 

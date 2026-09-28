@@ -1,25 +1,25 @@
-import { Controller, Req, UseGuards, Post, ForbiddenException, NotFoundException, UnauthorizedException, Body, HttpCode, Logger } from '@nestjs/common';
-import { StencilJWTPayload, StencilRequest } from 'src/shared/types/auth.types';
+import { Controller, Req, UseGuards, Post, ForbiddenException, NotFoundException, UnauthorizedException, Body, HttpCode } from '@nestjs/common';
 import { AuthGuard } from 'src/shared/access-control/auth.guard';
 import { RateLimit } from 'src/shared/access-control/rate-limit.decorator';
 import { RateLimitGuard } from 'src/shared/access-control/rate-limit.guard';
+import { AccountResolution, AccountResolver } from 'src/shared/access-control/account-resolver.service';
 import { EntityRegistry } from 'src/entities/entity.registry';
 import { Account } from 'src/entities/account/account.model';
 import { ItemResult } from 'src/shared/types/data/item-result';
-import { AccountStatus } from 'src/entities/enums/accountstatus';
+import { FeatureRequest } from 'src/shared/types/feature-request';
 import { isNullOrWhiteSpace } from 'src/shared/utils';
 import { IAvatarRequest, AvatarRequest } from './models/avatarrequest';
 import { INameRequest, NameRequest } from './models/namerequest';
+import { IProfileOperations } from './profile.operations';
 import { Sanitize } from 'src/shared/utils/sanitized';
 import { CloudStorageHandler } from 'src/features/platform/storage';
 import { StorageUtils } from 'src/features/utils/storage.utils';
 
 @Controller('v1/profile')
-export class ProfileController {
-   private readonly logger = new Logger(ProfileController.name);
-
+export class ProfileController implements IProfileOperations {
    constructor(
       private readonly entities: EntityRegistry,
+      private readonly accounts: AccountResolver,
       private readonly cloudStorageHandler: CloudStorageHandler,
    ) {}
 
@@ -27,11 +27,11 @@ export class ProfileController {
    @UseGuards(AuthGuard, RateLimitGuard)
    @Post('avatar')
    @HttpCode(200)
-   async avatar(@Req() request: StencilRequest, @Body(Sanitize.for(AvatarRequest)) input: IAvatarRequest) {
+   async avatarUpdate(@Req() request: FeatureRequest, @Body(Sanitize.for(AvatarRequest)) input: IAvatarRequest): Promise<ItemResult<Account.Self>> {
       if (!request.account) {
          throw new ForbiddenException();
       }
-      let account = await this.getAccountLive(request.auth!.payload);
+      let account = await this.getAccountLive(request);
 
       if (input.asset_id && !isNullOrWhiteSpace(input.asset_id)) {
          // verify asset id owner matches (no theft allowed)
@@ -48,7 +48,7 @@ export class ProfileController {
       }
 
       // get the latest
-      account = await this.getAccountLive(request.auth!.payload);
+      account = await this.getAccountLive(request);
 
       await StorageUtils.hydrateAvatarUrls(this.cloudStorageHandler, account);
 
@@ -63,11 +63,11 @@ export class ProfileController {
    @UseGuards(AuthGuard, RateLimitGuard)
    @Post('name')
    @HttpCode(200)
-   async name(@Req() request: StencilRequest, @Body(Sanitize.for(NameRequest)) input: INameRequest) {
+   async nameUpdate(@Req() request: FeatureRequest, @Body(Sanitize.for(NameRequest)) input: INameRequest): Promise<ItemResult<Account.Self>> {
       if (!request.account) {
          throw new ForbiddenException();
       }
-      let account = await this.getAccountLive(request.auth!.payload);
+      let account = await this.getAccountLive(request);
 
       if (input.display_name && !isNullOrWhiteSpace(input.display_name)) {
          const infoData = account.asInfoPerspective();
@@ -76,7 +76,7 @@ export class ProfileController {
       }
 
       // get the latest
-      account = await this.getAccountLive(request.auth!.payload);
+      account = await this.getAccountLive(request);
 
       await StorageUtils.hydrateAvatarUrls(this.cloudStorageHandler, account);
 
@@ -87,22 +87,16 @@ export class ProfileController {
       return result;
    }
 
-   async getAccountLive(jwtToken: StencilJWTPayload): Promise<Account> {
-      // don't use a user cache for auth commands
-      const globalAccount = await this.entities.globalAccountManager.getForAuthIdentifier(jwtToken.sub);
-      if (!globalAccount?.jurisdiction_id) {
-         throw new UnauthorizedException('unbound'); // 401 is important, the mobile app cancels the session when this happens.
+   /** Uncached account for auth commands. 401 is important: the mobile app cancels the session on it. */
+   private async getAccountLive(request: FeatureRequest): Promise<Account> {
+      const sub = request.auth?.payload.sub;
+      if (!sub) {
+         throw new UnauthorizedException('missing');
       }
-      const account = await this.entities.accountManager.getById(globalAccount.jurisdiction_id, globalAccount._id);
-      if (!account) {
-         throw new UnauthorizedException('missing'); // 401 is important, the mobile app cancels the session when this happens.
+      const { resolution, account } = await this.accounts.resolveLive(sub);
+      if (resolution !== AccountResolution.resolved || !account) {
+         throw new UnauthorizedException(resolution);
       }
-      switch (account.account_status) {
-      case AccountStatus.disabled:
-         throw new UnauthorizedException('disabled'); // 401 is important, the mobile app cancels the session when this happens.
-      case AccountStatus.enabled:
-      default:
-         return account;
-      }
+      return account;
    }
 }

@@ -11,7 +11,9 @@
    "testEnvironment": "node",
    "preset": "ts-jest",
    "moduleNameMapper": {
-      "^src/(.*)$": "<rootDir>/src/$1"
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^uuid$": "<rootDir>/test/setup/uuid-shim.ts",
+      "^firebase-admin/(app|auth)$": "<rootDir>/test/setup/firebase-admin-shim.ts"
    },
    "testTimeout": 60000
 }

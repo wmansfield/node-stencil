@@ -1,0 +1,25 @@
+---
+description: Read a projection from the database instead of loading the full document and trimming it
+globs: server/api/backend/src/**/*.ts
+alwaysApply: false
+---
+
+# Projection reads
+
+A projection exists so MongoDB returns only those fields. Feature lists and lookups that return `Entity.Directory`, `Entity.Board`, `Entity.Staff`, `Entity.Reference`, `Entity.Roster`, `Entity.Public`, or any other projection must query with that projection.
+
+Set `search="true"` on the projection. The generator emits `find{Name}` on the manager base, and that method calls `findAs` with the projection class and `Projection`. Set `get="true"` for one document; that emits `getById{Name}`. Do not hand-write those wrappers on `*.manager.ts`.
+
+`default="true"` also emits `find{Name}`, and it changes the generated CRUD return type to that projection. Use it only when CRUD itself should return the projection.
+
+```xml
+<projection name="Directory" search="true">
+```
+
+```typescript
+const found = await this.entities.entityManager.findDirectory(jurisdiction_id, 0, 500, keyword, 'display_name', false);
+```
+
+Do not `find()` the full entity and then `.map(item => item.toDirectory())`. That loads every field, including ones the caller must not receive, and only drops them in process.
+
+`toDirectory()` / `toBoard()` / `toStaff()` / `toReference()` are for a document already in memory after insert or update. Do not load the full document again with `getById` just to call `toX()`. Read it back with `getById{Name}`.

@@ -22,6 +22,7 @@ import { JurisdictionMismatchInterceptor } from './shared/interceptors/jurisdict
 import { HttpMetricsInterceptor } from './shared/interceptors/http-metrics.interceptor';
 import { BootstrapModule } from './features/platform/bootstrap/bootstrap.module';
 import { DeletionModule } from './features/platform/deletion/deletion.module';
+import { McpModule } from './shared/mcp/mcp.module';
 
 @Module({
    imports: [
@@ -45,6 +46,7 @@ import { DeletionModule } from './features/platform/deletion/deletion.module';
       UserModule,
       BootstrapModule,
       DeletionModule,
+      McpModule,
    ],
    providers: [
       AppConfigModule,
@@ -74,6 +76,7 @@ export class AppModule implements OnApplicationShutdown, NestModule {
             'health',
             'metrics',
             'v1/auth/dev-token',
+            'mcp',
          )
          .forRoutes('{*splat}');
    }

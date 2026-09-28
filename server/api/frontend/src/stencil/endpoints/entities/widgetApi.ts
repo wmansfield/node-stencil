@@ -6,6 +6,7 @@ import { ListInput } from '@/stencil/models/list-input';
 import { ListInputWidget } from '@/stencil/models/entities/requests/list-input-widget';
 import { ListResult, ListResultMeta } from '@/stencil/models/list-result';
 import { RoutedInput, RoutedNoInput } from '@/stencil/models/routed-input';
+import { IWidget_Public } from '@/stencil/models/entities/widget';
 
 export const addTagTypes = ['widget', 'widgets'] as const;
 
@@ -27,6 +28,13 @@ const WidgetsApi = apiService
 				query: params => ({ 
 					url: `admin/${params.jurisdiction_id}/widget/${params.input}`,
 					method: 'GET'
+				}),
+				providesTags: ['widget']
+			}),
+			getWidgetPublic: build.query<ItemResult<IWidget_Public>, RoutedInput<string>>({
+				query: (params) => ({ 
+					url: `admin/${params.jurisdiction_id}/widget/${params.input}/public`,
+          			method: 'GET',
 				}),
 				providesTags: ['widget']
 			}),
@@ -62,6 +70,7 @@ export default WidgetsApi;
 
 export const {
 	useGetWidgetsQuery,
+	useGetWidgetPublicQuery,
 	useGetWidgetQuery,
 	useDeleteWidgetMutation,
 	useCreateWidgetMutation,useReplaceWidgetMutation,

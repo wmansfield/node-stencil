@@ -4,6 +4,7 @@ import { ModelAnnotations } from 'src/shared/utils/model-annotations';
 import mongooseLeanGetters from 'mongoose-lean-getters';
 import { uuidAutoConversionPlugin } from 'src/shared/mongo/uuid-auto-conversion.plugin';
 import { LocalizedText } from 'src/entities/localizedtext/localizedtext.schema';
+import { ContentSection } from 'src/entities/contentsection/contentsection.schema';
 import { LocalizedContent } from 'src/entities/localizedcontent/localizedcontent.schema';
 import { MediaInfo } from 'src/entities/mediainfo/mediainfo.schema';
 import { FullDate } from 'src/entities/fulldate/fulldate.schema';
@@ -15,6 +16,60 @@ export const PRIMARY_KEY = '_id';
 
 export namespace Widget {
 
+   
+   // ===========================================
+   // Projection: Widget.Public
+   // ===========================================
+   @Schema()
+   export class PublicDocument {
+      
+      @Prop({
+         ...ModelAnnotations.uuid,
+         required: true,
+      })
+      _id: string;
+      
+      @Prop({
+         type: String,
+         required: true,
+      })
+      jurisdiction_id: string;
+      
+      @Prop({
+         type: String,
+         required: true,
+      })
+      title: string;
+      
+      @Prop({
+         type: [ContentSection.ContentSectionSchema],
+         required: false,
+      })
+      description: ContentSection.ContentSectionDocument;
+      
+      @Prop({
+         type: MediaInfo.MediaInfoSchema,
+         required: false,
+      })
+      media: MediaInfo.MediaInfoDocument;
+      
+      @Prop({
+         type: MediaInfo.MediaInfoSchema,
+         required: false,
+      })
+      avatar: MediaInfo.MediaInfoDocument;
+      
+      @Prop({
+         type: FullDate.FullDateSchema,
+         required: false,
+      })
+      published_date: FullDate.FullDateDocument;
+      
+   }
+
+   export const PublicSchema = SchemaFactory.createForClass(PublicDocument);
+   PublicSchema.plugin(mongooseLeanGetters);
+   PublicSchema.plugin(uuidAutoConversionPlugin);
    
    
    // ===========================================
@@ -54,10 +109,10 @@ export namespace Widget {
       title_localized: LocalizedText.LocalizedTextDocument[];
       
       @Prop({
-         type: String,
+         type: [ContentSection.ContentSectionSchema],
          required: false,
       })
-      description: string;
+      description: ContentSection.ContentSectionDocument[];
       
       @Prop({
          type: [LocalizedContent.LocalizedContentSchema],

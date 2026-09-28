@@ -1,0 +1,27 @@
+---
+description: MCP tools come only from XML <mcp> nodes; feature controllers implement the generated I{Feature}Operations with FeatureRequest; no hand-registered tools
+globs: server/api/backend/src/features/**/*.ts,server/api/backend/src/shared/mcp/**/*.ts,server/generation/xml/*.xml
+alwaysApply: false
+---
+
+# MCP Tools
+
+An operation is an MCP tool only when its `<query>`/`<mutation>` in `stencil-entities.xml` has an `<mcp>` child. Full pattern: `server/api/ai/patterns/mcp.md`.
+
+## Rules
+
+- **XML only.** Never register, rename, or describe a tool in TypeScript. `*.operations.ts`, `*.mcp.base.ts`, `features/mcp.schemas.ts`, and `features/mcp.registry.ts` are rewritten every generator run.
+- **The controller implements the contract.** `{Feature}Controller implements I{Feature}Operations`. No service layer for MCP; MCP calls the controller method directly.
+- **`FeatureRequest`, not `StencilRequest`,** on MCP-exposed methods. If the logic needs the raw HTTP request, split the shared part into a private method both paths call.
+- **Method names equal XML operation names.**
+- **Singleton controllers only.** Do not introduce request-scoped providers or controllers; caller context travels as arguments.
+- **Tenant from the account.** Data access uses `request.account.jurisdiction_id`. MCP-exposed request models never carry a jurisdiction; `requestRouted` operations cannot be tools.
+- **Results are projections, class-only types, or feature entities.** Never a full document.
+- **Retry-safe endpoints.** A repeated call must be harmless (set, not increment; creates backed by a unique key). Declare `idempotent="false"` honestly when it is not; the runtime does not de-duplicate.
+- **Descriptions are for the model.** `<description>` says what the tool does and returns; request fields carry `friendlyName` and `description`. Static text only, never built from stored data.
+
+## Do not
+
+- Weaken `/api/mcp` checks: gateway credential on every request, `_forge_identity` verification on every `tools/call` (typ, issuer, audience, lifetime, tool binding, single-use `jti`), live account, regional home.
+- Accept an app login token (Firebase, Forge, or other id_token) as a tool-call identity, or forward any caller token upstream.
+- Log `_forge_identity`, full `sub`, or raw tool arguments (the audit line records a hash).

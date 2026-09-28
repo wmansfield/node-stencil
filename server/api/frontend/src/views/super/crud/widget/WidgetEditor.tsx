@@ -18,6 +18,10 @@ import LocalizedText from '@/stencil/models/entities/localizedtext';
 import LocalizedTextEditor, { localizedTextSchema } from '../localizedtext/LocalizedTextEditor';
 import LocalizedTextListEditor from '../localizedtext/LocalizedTextListEditor';
 
+import ContentSection from '@/stencil/models/entities/contentsection';
+import ContentSectionEditor, { contentSectionSchema } from '../contentsection/ContentSectionEditor';
+import ContentSectionListEditor from '../contentsection/ContentSectionListEditor';
+
 import LocalizedContent from '@/stencil/models/entities/localizedcontent';
 import LocalizedContentEditor, { localizedContentSchema } from '../localizedcontent/LocalizedContentEditor';
 import LocalizedContentListEditor from '../localizedcontent/LocalizedContentListEditor';
@@ -71,7 +75,7 @@ const schema = z.object({
    asset_id_media: z.string().optional(),
    title: z.string().max(200, 'Cannot be more than 200 characters.'),
    title_localized: z.array(localizedTextSchema).optional(),
-   description: z.string().optional(),
+   description: z.array(contentSectionSchema).optional(),
    description_localized: z.array(localizedContentSchema).optional(),
    published_date: fullDateSchema.optional(),
    reference: iDPairSchema.optional(),
@@ -426,17 +430,10 @@ function WidgetEditor(props: WidgetEditorProps) {
                            errorMessage={errors.description?.message}
                         >
                            
-                           <Controller
-                              name="description"
-                              control={control}
-                              render={({ field }) => (
-                                 <Input
-                                    {...field}
-                                    className="mb-2"
-                                    id="description"
-                                 />
-                              )}
-                           />
+                              <ContentSectionListEditor
+                                 name="description"
+                                 className="mb-4"
+                              />
                            
                         </FormItem>
                         

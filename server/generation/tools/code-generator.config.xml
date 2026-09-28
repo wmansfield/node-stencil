@@ -6,6 +6,7 @@
     <string>..\xsl\nest.controller.xsl</string>
     <string>..\xsl\nest.dependency.xsl</string>
     <string>..\xsl\nest.manager.xsl</string>
+    <string>..\xsl\nest.mcp.xsl</string>
     <string>..\xsl\nest.model.xsl</string>
     <string>..\xsl\nest.module.xsl</string>
     <string>..\xsl\nest.schema.xsl</string>

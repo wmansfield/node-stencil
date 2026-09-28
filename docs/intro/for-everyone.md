@@ -48,6 +48,7 @@ If you are not sure which file to touch, **ask**. “Is this XML, a manager hook
 | Dual-homed | A row that exists in more than one place (local + remote account ids). Queries must include the local id. |
 | Federation | Regions talking to each other over signed HTTPS. Optional; local dev can be one process. |
 | Memory cache | Short-lived `Map` inside one Node process for hot reads (roles, settings, account lookup). A write does not clear it. See [Memory cache](./memory-cache.md). |
+| Localized content | Default language lives in the ordinary field (`title`, `description`). Other languages live in `*_localized`. A feature read copies the requested language onto that field. Admin CRUD returns both as stored. See [Localized content](./localized-content.md). |
 
 ## What the AI is for
 

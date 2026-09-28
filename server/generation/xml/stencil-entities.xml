@@ -213,12 +213,21 @@
     <field type="Uuid" isNullable="true" foreignKey="JurisdictionAsset" foreignKeyField="_id" foreignKeyInvalidatesMe="true" recalculate="true" uiUploadAsset="Jurisdiction" uiUploadAvatar="avatar" friendlyName="Media Asset">asset_id_media</field>
     <field type="string" isNullable="false" maxLength="200" uiList="true" searchable="true" sortable="true" friendlyName="Title">title</field>
     <field type="LocalizedText[]" isNullable="true" perspective="Config" isClass="true" recalculate="true" friendlyName="Title Localized">title_localized</field>
-    <field type="string" isNullable="true" maxLength="none" perspective="Config" searchable="true" friendlyName="Description">description</field>
+    <field type="ContentSection[]" isNullable="true" perspective="Config" isClass="true" friendlyName="Description">description</field>
     <field type="LocalizedContent[]" isNullable="true" perspective="Config" isClass="true" recalculate="true" friendlyName="Description Localized">description_localized</field>
     <field calculated="other" type="MediaInfo" isNullable="true" isClass="true" friendlyName="Media">media</field>
     <field type="FullDate" isNullable="true" isClass="true" friendlyName="Published Date">published_date</field>
     <field type="IDPair" isNullable="true" isClass="true" friendlyName="Reference">reference</field>
     <field calculated="other" type="MediaInfo" isNullable="true" isClass="true" isAvatar="true" friendlyName="Avatar">avatar</field>
+    <projection name="Public" get="true">
+      <entry>_id</entry>
+      <entry>jurisdiction_id</entry>
+      <entry>title</entry>
+      <entry>description</entry>
+      <entry>media</entry>
+      <entry>avatar</entry>
+      <entry>published_date</entry>
+    </projection>
   </item>
   <enum name="AccountStatus">
     <field value="-1">disabled</field>
@@ -281,13 +290,29 @@
   <feature name="profile" area="user" native="true">
     <entity name="Account.Self" isItem="true"/>
     <entity name="AvatarRequest">
-      <field type="Uuid">asset_id</field>
+      <field type="Uuid" friendlyName="Avatar Asset" description="Id of an image asset the caller uploaded.">asset_id</field>
     </entity>
     <entity name="NameRequest">
-      <field type="string">display_name</field>
+      <field type="string" friendlyName="Display Name" description="Name shown to other people.">display_name</field>
     </entity>
-    <mutation name="nameUpdate" route="v1/profile/name" request="params" requestType="NameRequest" itemResult="Account.Self" />
-    <mutation name="avatarUpdate" route="v1/profile/avatar" request="params" requestType="AvatarRequest" itemResult="Account.Self" />
+    <mutation name="nameUpdate" route="v1/profile/name" request="params" requestType="NameRequest" itemResult="Account.Self">
+      <mcp tool="profile_update_display_name" title="Update display name" destructive="false" idempotent="true">
+        <description>Set the signed-in user's display name. Returns the updated profile.</description>
+      </mcp>
+    </mutation>
+    <mutation name="avatarUpdate" route="v1/profile/avatar" request="params" requestType="AvatarRequest" itemResult="Account.Self">
+      <mcp tool="profile_update_avatar" title="Update avatar" destructive="false" idempotent="true">
+        <description>Set the signed-in user's avatar to an image asset they uploaded. Returns the updated profile.</description>
+      </mcp>
+    </mutation>
+  </feature>
+  <feature name="widget" area="user">
+    <entity name="Widget.Public" isItem="true"/>
+    <entity name="WidgetReadRequest">
+      <field type="Uuid" friendlyName="Widget" description="Id of the widget to read.">widget_id</field>
+      <field type="string" isNullable="true" friendlyName="Language" description="Language code. A matching translation replaces the default title and description. Otherwise those stored defaults are returned.">language_code</field>
+    </entity>
+    <query name="get" route="v1/widgets/get" post="true" request="params" requestType="WidgetReadRequest" itemResult="Widget.Public" />
   </feature>
   <feature name="Task" area="admin">
     <mutation name="triggerInvalidateEverything" route="platform/tasks/invalidateall" />

@@ -133,6 +133,14 @@ Consequences:
 
 `get="true"` on a projection emits the specialized getter. Without it you still have the type; you do not have the query.
 
+## Localized content
+
+The ordinary field is the default language. Other languages are an embedded array beside it. `LocalizedText` fills a string (`title` ← `text`). `LocalizedContent` fills a body of sections (`description` ← `contents`, both `ContentSection[]`).
+
+Generated admin CRUD returns that pair as stored. It does not take a language. There is no generator attribute for the swap: a feature endpoint loads the full document, copies it, writes the matching language onto the default fields, and returns a projection that includes those fields and omits the arrays. A missing language leaves the stored default. The copy is not saved.
+
+This clone's example is `POST /api/v1/widgets/get`. Intro: [`docs/intro/localized-content.md`](../../../docs/intro/localized-content.md). Pattern: [`patterns/localized-content.md`](./patterns/localized-content.md).
+
 ## Identity, tenancy, and access
 
 **Jurisdiction is a first-class tenant**, not a filter you remember to add. Every document entity declares `tenant`:
@@ -214,5 +222,6 @@ Designed production topology (docs, not IaC in this clone): Cloudflare WAF + Ful
 - Account erasure (DSAR): [`patterns/account-deletion.md`](./patterns/account-deletion.md)
 - Feature controllers: [`patterns/feature-controllers.md`](./patterns/feature-controllers.md)
 - Calculated fields / computed references: [`patterns/calculated-fields-and-references.md`](./patterns/calculated-fields-and-references.md)
+- Localized content: [`patterns/localized-content.md`](./patterns/localized-content.md)
 - Extending managers: [`patterns/extending-generated-code.md`](./patterns/extending-generated-code.md)
 - XML contract: [`code-generation.md`](./code-generation.md)

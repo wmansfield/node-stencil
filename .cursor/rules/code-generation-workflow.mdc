@@ -30,6 +30,7 @@ Documented XML attributes are available even when `stencil-entities.xml` does no
 - `list-input-*.ts`
 - `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts`
 - `entities/dependencies/dependency-coordinator.ts` (from `nest.dependency.xsl`)
+- MCP output from `nest.mcp.xsl`: `features/mcp.schemas.ts`, `features/mcp.registry.ts`, `features/**/*.operations.ts`, `features/**/*.mcp.base.ts` (the hand-written `{Feature}Controller` implements the generated `I{Feature}Operations`)
 - Generated frontend/API model stubs (`server/api/frontend/src/stencil/**/models/**`, `server/api/frontend/src/stencil/**/endpoints/**`) — **including feature APIs**
 
 This repository has no mobile `app/` tree. Ignore docs that mention `app/src/cloud/`.

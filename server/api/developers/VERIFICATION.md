@@ -33,8 +33,9 @@ A list of **things that should be true** about the codebase. You can ask the ass
 | Controller | Test file | Status |
 |---|---|---|
 | `auth.controller.ts` | `auth.e2e-spec.ts` | Covered |
-| `media.controller.ts` | `media.e2e-spec.ts` | Covered |
+| `media.controller.ts` | `media.e2e-spec.ts` | Missing (file does not exist) |
 | `profile.controller.ts` | `profile.e2e-spec.ts` | Covered |
+| `shared/mcp/mcp.controller.ts` | `mcp.e2e-spec.ts`, `mcp-stack.e2e-spec.ts` | Covered |
 
 **Last verified:** —
 
@@ -51,6 +52,30 @@ A list of **things that should be true** about the codebase. You can ask the ass
 - `auth_identifier` (Firebase UID) — stored in Account, GlobalAccount
 - `sub` (JWT claim) — decoded in middleware, used throughout controllers/managers
 - `uid` (Firebase Admin parameter) — used in FirebaseService
+
+**Last verified:** —
+
+### `mcp-xml-only` — MCP tools exist only through XML
+
+**Statement:** Every MCP tool comes from an `<mcp>` child in `stencil-entities.xml`. No tool is defined, registered, or described in hand-written TypeScript, and each MCP-enabled feature's controller declares `implements I{Feature}Operations` with `FeatureRequest` parameters.
+
+**How to verify:**
+1. `features/mcp.registry.ts`, `features/mcp.schemas.ts`, `features/**/*.operations.ts`, and `features/**/*.mcp.base.ts` must match a fresh generator run (no diff after running the CLI).
+2. Search `backend/src/` for `setRequestHandler('tools/`: only `shared/mcp/mcp.server.ts` may match, and it lists tools from `McpDispatcher` only.
+3. For each feature in `mcp.registry.ts`, its `*.controller.ts` declares `implements I{Feature}Operations`, and the MCP-exposed methods take `FeatureRequest` (a `StencilRequest` there fails `tsc`).
+4. The `tools/list` snapshot in `test/features/__snapshots__/mcp.e2e-spec.ts.snap` changes only alongside a deliberate XML change.
+
+**Last verified:** —
+
+### `mcp-identity` — MCP tool calls run only as a verified, local user
+
+**Statement:** `/api/mcp` requires the gateway credential on every request, and every `tools/call` requires a valid gateway identity assertion bound to this endpoint and that tool, used once, for a live enabled account homed on this instance. Caller-supplied jurisdiction is never used.
+
+**How to verify:**
+1. `McpController` checks the gateway credential with a constant-time compare before calling the SDK; `/api/mcp` is excluded from `JwtAuthMiddleware` (app id_tokens are not accepted there).
+2. `McpIdentityVerifier.verify` passes `typ: 'forge-upstream+jwt'`, `issuer` (`MCP_IDENTITY_ISSUER`), `audience: MCP_RESOURCE_URL`, `algorithms: ['RS256']`, `maxTokenAge`, and required claims to `jwtVerify`, checks `mcp_tool` against the called tool, and claims the `jti` in `McpReplayStore`.
+3. `McpDispatcher` removes `_forge_identity` before validation, resolves the account through `AccountResolver`, rejects accounts outside `FEDERATION_JURISDICTION`, and builds `FeatureRequest` only from the verified identity and that account.
+4. `npm run test:e2e` passes, including every rejection case in `mcp.e2e-spec.ts`.
 
 **Last verified:** —
 

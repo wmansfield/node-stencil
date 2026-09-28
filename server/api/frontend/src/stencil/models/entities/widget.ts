@@ -3,6 +3,8 @@ import { PartialDeep } from 'type-fest';
 
 import { ILocalizedText } from './localizedtext';
 
+import { IContentSection } from './contentsection';
+
 import { ILocalizedContent } from './localizedcontent';
 
 import { IMediaInfo } from './mediainfo';
@@ -20,7 +22,7 @@ export interface IWidget extends IWidgetOption  {
   jurisdiction_id: string;
   asset_id_media?: string;
   title_localized?: ILocalizedText[];
-  description?: string;
+  description?: IContentSection[];
   description_localized?: ILocalizedContent[];
   media?: IMediaInfo;
   published_date?: IFullDate;
@@ -28,6 +30,18 @@ export interface IWidget extends IWidgetOption  {
   avatar?: IMediaInfo;
   updated_utc?: Date,
   created_utc?: Date
+}
+
+export interface IWidget_Public {
+   _id: string;
+   jurisdiction_id: string;
+   title: string;
+   description?: IContentSection[];
+   media?: IMediaInfo;
+   avatar?: IMediaInfo;
+   published_date?: IFullDate;
+   
+   updated_utc?: Date
 }
 
 

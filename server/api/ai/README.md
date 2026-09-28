@@ -45,7 +45,9 @@ The codebase uses code generation. The workflow is:
 | `patterns/federation-and-dual-homed.md` | Working with dual-homed entities, federation, sync, or tombstones |
 | `patterns/account-deletion.md` | Schema-owned physical account erasure (DSAR) |
 | `patterns/calculated-fields-and-references.md` | Adding computed fields or computed references (projection of a foreign entity) |
+| `patterns/localized-content.md` | Default-language fields and the feature read that copies a translation onto them |
 | `patterns/webhook-ingestion.md` | Consuming inbound webhooks (queue + scheduled/manual processor) |
+| `patterns/mcp.md` | Exposing feature operations as MCP tools (`<mcp>` in XML, controller implements the contract) |
 | `verification.md` | Checking invariants and test expectations before finishing |
 
 ## Cursor Rules

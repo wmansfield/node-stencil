@@ -1,4 +1,5 @@
 import { LocalizedText } from 'src/entities/localizedtext/localizedtext.model';
+import { ContentSection } from 'src/entities/contentsection/contentsection.model';
 import { LocalizedContent } from 'src/entities/localizedcontent/localizedcontent.model';
 import { MediaInfo } from 'src/entities/mediainfo/mediainfo.model';
 import { FullDate } from 'src/entities/fulldate/fulldate.model';
@@ -32,7 +33,7 @@ export class Widget {
    asset_id_media?: string;
    title!: string;
    title_localized?: LocalizedText[];
-   description?: string;
+   description?: ContentSection[];
    description_localized?: LocalizedContent[];
    /**
    * Calculated Field
@@ -81,8 +82,8 @@ export class Widget {
       if (!obj) return;
       obj.jurisdiction_id = sanitizeHtml(obj.jurisdiction_id, false);
       obj.title = sanitizeHtml(obj.title, false);
-      obj.description = sanitizeHtml(obj.description, false);
       obj.title_localized?.forEach(item => LocalizedText.sanitize(item));
+      obj.description?.forEach(item => ContentSection.sanitize(item));
       obj.description_localized?.forEach(item => LocalizedContent.sanitize(item));
       if (obj.media) MediaInfo.sanitize(obj.media);
       if (obj.published_date) FullDate.sanitize(obj.published_date);
@@ -112,6 +113,10 @@ export class Widget {
    
    forCalculation(): Widget.CalculationSource {
       return new Widget.CalculationSource(this);
+   }
+   
+   toPublic(): Widget.Public {
+      return Widget.Public.fromWidget(this);
    }
    
 
@@ -332,10 +337,10 @@ export namespace Widget {
          return this.actual.title_localized;
       }
       
-      set description(value: string | undefined) { 
+      set description(value: ContentSection[] | undefined) { 
          this.actual.description = value;
       }
-      get description() : string | undefined {
+      get description() : ContentSection[] | undefined {
          return this.actual.description;
       }
       
@@ -345,6 +350,56 @@ export namespace Widget {
       get description_localized() : LocalizedContent[] | undefined {
          return this.actual.description_localized;
       }
+      
+   }
+   
+   // ===========================================
+   // Projections
+   // ===========================================
+   
+   export class Public
+   {
+      static Projection = {
+         _id: 1,
+         jurisdiction_id: 1,
+         title: 1,
+         description: 1,
+         media: 1,
+         avatar: 1,
+         published_date: 1,
+         
+      };
+
+      static fromWidget(data: Widget) : Public {
+         const result = new Public();
+         result._id = data._id;
+         result.jurisdiction_id = data.jurisdiction_id;
+         result.title = data.title;
+         result.description = data.description;
+         result.media = data.media;
+         result.avatar = data.avatar;
+         result.published_date = data.published_date;
+         
+         return result;
+      }
+      static copyToWidget(source: Widget.Public, target: Widget): void {
+         //Disallow: target._id = source._id;
+         //Disallow: target.jurisdiction_id = source.jurisdiction_id;
+         target.title = source.title;
+         target.description = source.description;
+         target.media = source.media;
+         target.avatar = source.avatar;
+         target.published_date = source.published_date;
+         
+      }
+
+      _id!: string;
+      jurisdiction_id!: string;
+      title!: string;
+      description?: ContentSection[];
+      media?: MediaInfo;
+      avatar?: MediaInfo;
+      published_date?: FullDate;
       
    }
    

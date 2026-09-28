@@ -18,6 +18,8 @@ import {
 
 import { LocalizedText } from '../localizedtext/localizedtext.model';
 import '../localizedtext/localizedtext.sanitized.validators';
+import { ContentSection } from '../contentsection/contentsection.model';
+import '../contentsection/contentsection.sanitized.validators';
 import { LocalizedContent } from '../localizedcontent/localizedcontent.model';
 import '../localizedcontent/localizedcontent.sanitized.validators';
 import { FullDate } from '../fulldate/fulldate.model';
@@ -34,7 +36,7 @@ jurisdiction_id: (v) => assertString(v, 'jurisdiction_id'),
 asset_id_media: (v) => optional(assertUuid)(v, 'asset_id_media'),
 title: (v) => assertString(v, 'title'),
 title_localized: (v) => optional(assertNestedArray(LocalizedText))(v, 'title_localized'),
-description: (v) => optional(assertString)(v, 'description'),
+description: (v) => optional(assertNestedArray(ContentSection))(v, 'description'),
 description_localized: (v) => optional(assertNestedArray(LocalizedContent))(v, 'description_localized'),
 published_date: (v) => optional(assertNested(FullDate))(v, 'published_date'),
 reference: (v) => optional(assertNested(IDPair))(v, 'reference'),
@@ -42,3 +44,17 @@ reference: (v) => optional(assertNested(IDPair))(v, 'reference'),
 };
 
 registerSanitizedValidators(Widget, widgetValidators);
+
+
+const widgetpublicValidators: SanitizedValidatorMap = {
+_id: (v) => optional(assertUuid)(v, '_id'),
+jurisdiction_id: (v) => assertString(v, 'jurisdiction_id'),
+title: (v) => assertString(v, 'title'),
+description: (v) => optional(assertNestedArray(ContentSection))(v, 'description'),
+media: (v) => optional(assertNested(MediaInfo))(v, 'media'),
+avatar: (v) => optional(assertNested(MediaInfo))(v, 'avatar'),
+published_date: (v) => optional(assertNested(FullDate))(v, 'published_date'),
+
+};
+
+registerSanitizedValidators(Widget.Public, widgetpublicValidators);

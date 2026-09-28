@@ -1,0 +1,553 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MCP endpoint (e2e) tools/list matches the published tool contract (review any snapshot change as an API change) 1`] = `
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Update avatar",
+    },
+    "description": "Set the signed-in user's avatar to an image asset they uploaded. Returns the updated profile.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "description": "Id of an image asset the caller uploaded.",
+          "format": "uuid",
+          "title": "Avatar Asset",
+          "type": "string",
+        },
+      },
+      "required": [
+        "asset_id",
+      ],
+      "type": "object",
+    },
+    "name": "profile_update_avatar",
+    "outputSchema": {
+      "properties": {
+        "_id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string",
+        },
+        "account_status": {
+          "oneOf": [
+            {
+              "const": -1,
+              "title": "disabled",
+            },
+            {
+              "const": 0,
+              "title": "enabled",
+            },
+          ],
+          "title": "Status",
+          "type": "integer",
+        },
+        "auth_provider": {
+          "maxLength": 150,
+          "title": "Auth Provider",
+          "type": "string",
+        },
+        "avatar": {
+          "anyOf": [
+            {
+              "properties": {
+                "_id": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Id",
+                },
+                "asset_kind": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "const": 0,
+                          "title": "image",
+                        },
+                        {
+                          "const": 1,
+                          "title": "audio",
+                        },
+                        {
+                          "const": 2,
+                          "title": "avatar",
+                        },
+                      ],
+                      "type": "integer",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "asset_kind",
+                },
+                "jurisdiction_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Jurisdiction",
+                },
+                "raw_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Raw Url",
+                },
+                "storage_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Storage Key",
+                },
+                "thumb_large_dimensions": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "height": {
+                          "title": "Height",
+                          "type": "integer",
+                        },
+                        "width": {
+                          "title": "Width",
+                          "type": "integer",
+                        },
+                      },
+                      "type": "object",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Dimensions",
+                },
+                "thumb_large_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Key",
+                },
+                "thumb_large_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Url",
+                },
+                "thumb_small_dimensions": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "height": {
+                          "title": "Height",
+                          "type": "integer",
+                        },
+                        "width": {
+                          "title": "Width",
+                          "type": "integer",
+                        },
+                      },
+                      "type": "object",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Thumb Dimensions",
+                },
+                "thumb_small_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Thumb Key",
+                },
+                "thumb_small_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Small Url",
+                },
+              },
+              "type": "object",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Avatar",
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "maxLength": 150,
+              "type": "string",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Display Name",
+        },
+        "email": {
+          "maxLength": 128,
+          "title": "E-mail",
+          "type": "string",
+        },
+        "impersonated": {
+          "title": "Impersonated",
+          "type": "boolean",
+        },
+        "joined_utc": {
+          "format": "date-time",
+          "title": "Joined",
+          "type": "string",
+        },
+        "jurisdiction_id": {
+          "maxLength": 10,
+          "title": "Jurisdiction",
+          "type": "string",
+        },
+        "roles": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string",
+              },
+              "type": "array",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Roles",
+        },
+        "token": {
+          "title": "Token",
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "title": "Update avatar",
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Update display name",
+    },
+    "description": "Set the signed-in user's display name. Returns the updated profile.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {
+          "description": "Name shown to other people.",
+          "title": "Display Name",
+          "type": "string",
+        },
+      },
+      "required": [
+        "display_name",
+      ],
+      "type": "object",
+    },
+    "name": "profile_update_display_name",
+    "outputSchema": {
+      "properties": {
+        "_id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string",
+        },
+        "account_status": {
+          "oneOf": [
+            {
+              "const": -1,
+              "title": "disabled",
+            },
+            {
+              "const": 0,
+              "title": "enabled",
+            },
+          ],
+          "title": "Status",
+          "type": "integer",
+        },
+        "auth_provider": {
+          "maxLength": 150,
+          "title": "Auth Provider",
+          "type": "string",
+        },
+        "avatar": {
+          "anyOf": [
+            {
+              "properties": {
+                "_id": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Id",
+                },
+                "asset_kind": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "const": 0,
+                          "title": "image",
+                        },
+                        {
+                          "const": 1,
+                          "title": "audio",
+                        },
+                        {
+                          "const": 2,
+                          "title": "avatar",
+                        },
+                      ],
+                      "type": "integer",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "asset_kind",
+                },
+                "jurisdiction_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Jurisdiction",
+                },
+                "raw_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Raw Url",
+                },
+                "storage_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Storage Key",
+                },
+                "thumb_large_dimensions": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "height": {
+                          "title": "Height",
+                          "type": "integer",
+                        },
+                        "width": {
+                          "title": "Width",
+                          "type": "integer",
+                        },
+                      },
+                      "type": "object",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Dimensions",
+                },
+                "thumb_large_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Key",
+                },
+                "thumb_large_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Large Url",
+                },
+                "thumb_small_dimensions": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "height": {
+                          "title": "Height",
+                          "type": "integer",
+                        },
+                        "width": {
+                          "title": "Width",
+                          "type": "integer",
+                        },
+                      },
+                      "type": "object",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Thumb Dimensions",
+                },
+                "thumb_small_key": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Thumb Key",
+                },
+                "thumb_small_url": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                  "title": "Small Url",
+                },
+              },
+              "type": "object",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Avatar",
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "maxLength": 150,
+              "type": "string",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Display Name",
+        },
+        "email": {
+          "maxLength": 128,
+          "title": "E-mail",
+          "type": "string",
+        },
+        "impersonated": {
+          "title": "Impersonated",
+          "type": "boolean",
+        },
+        "joined_utc": {
+          "format": "date-time",
+          "title": "Joined",
+          "type": "string",
+        },
+        "jurisdiction_id": {
+          "maxLength": 10,
+          "title": "Jurisdiction",
+          "type": "string",
+        },
+        "roles": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string",
+              },
+              "type": "array",
+            },
+            {
+              "type": "null",
+            },
+          ],
+          "title": "Roles",
+        },
+        "token": {
+          "title": "Token",
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "title": "Update display name",
+  },
+]
+`;

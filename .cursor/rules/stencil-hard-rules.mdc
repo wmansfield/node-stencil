@@ -18,5 +18,6 @@ These are non-negotiable. Details live in glob-scoped rules and `server/api/ai/`
 - **Tombstones:** federated or sync-tracked normal deletes set `deleted_utc` (and bump `edited_utc`). Physical `delete()` is for GDPR/DSAR processors only.
 - **Contracts:** add behavior to the named interface or narrow to a concrete type. No inline optional methods at call sites.
 - **Privacy:** never log full Firebase UID, `auth_identifier`, JWT `sub`, or equivalent stable ids.
+- **Projection reads:** a list or lookup that returns a projection uses `search="true"` (list: `find{Name}`) or `get="true"` (one document: `getById{Name}`) on the projection. Those generated methods already query with `Projection`. Do not hand-write the wrapper, and do not `getById` or `find()` the full document and then `toDirectory()` / `toBoard()` / `toStaff()` / `toReference()`. Mapping with `toX()` is only for a document already in memory after a write. `default="true"` also emits the list method and changes generated CRUD to return that projection.
 
 Do not take architecture or security shortcuts because the first version is complicated. Cut scope only for true feasibility limits (cost, ship date, missing expertise).

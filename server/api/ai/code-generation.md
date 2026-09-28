@@ -62,6 +62,8 @@ This repository has no native app. Feature clients are TypeScript, generated for
 | `nest.controller.xsl` | `{entity}.controller.base.ts` | Rewritten |
 | `nest.controller.xsl` | `{entity}.controller.ts` | Created once, then skipped |
 | `nest.module.xsl` | `entity.module.ts`, `entity.registry.ts` | Rewritten |
+| `nest.mcp.xsl` | `features/mcp.schemas.ts`, `features/mcp.registry.ts` | Rewritten |
+| `nest.mcp.xsl` | `features/{area}/{feature}/{feature}.operations.ts`, `{feature}.mcp.base.ts` | Rewritten |
 
 ### Frontend (React)
 | Template | Output | Next run |
@@ -78,6 +80,7 @@ Do not edit these directly. Change XML or XSL, run the generator, then customize
 - Backend `*.model.ts`, `*.schema.ts`, `*.manager.base.ts`, `*.controller.base.ts`
 - Backend `*.sanitized.validators.ts`, `list-input-*.ts`
 - Backend generated aggregators: `entity.module.ts`, `entity.registry.ts`, `account-deletion-manager.ts`
+- Backend MCP output: `features/mcp.schemas.ts`, `features/mcp.registry.ts`, `features/**/*.operations.ts`, `features/**/*.mcp.base.ts`
 - Generated `entities/dependencies/dependency-coordinator.ts`
 - Generated frontend/app entity models and API stubs
 - Generated feature FE clients: `frontend/src/stencil/endpoints/features/**/*Api.ts` and `frontend/src/stencil/models/features/**`
@@ -368,6 +371,41 @@ A `<feature>` is an HTTP contract for a TypeScript client. In this repository th
 | `authToken` | Where the auth token is read from |
 | `authJurisdiction` | Where jurisdiction is read from for the signed call |
 | `invalidation` | RTK tag name (`providesTags` on queries, `invalidatesTags` on mutations) |
+
+Feature entity `<field>` elements also take `friendlyName` and `description`. They become the JSON Schema `title` and `description` of MCP tool arguments, which is what a model reads to fill them in.
+
+### MCP tools (`<mcp>`)
+
+A `<query>` or `<mutation>` becomes an MCP tool only when it carries an `<mcp>` child. Without one, the operation is not reachable over MCP. Which callers may use a tool is decided by the MCP gateway in front of this API, not here.
+
+```xml
+<mutation name="nameUpdate" route="v1/profile/name" request="params" requestType="NameRequest" itemResult="Account.Self">
+  <mcp tool="profile_update_display_name" title="Update display name" destructive="false" idempotent="true">
+    <description>Set the signed-in user's display name. Returns the updated profile.</description>
+  </mcp>
+</mutation>
+```
+
+| Attribute / child | Purpose |
+|-------------------|---------|
+| `tool` | Tool name: 1-64 characters of `[a-z0-9_]`, unique across the schema. Treat it as a public contract once published |
+| `title` | Short human label (required) |
+| `<description>` | What the tool does and returns, written for the model choosing it (required) |
+| `destructive`, `idempotent` | Required on `<mutation>`. Queries default to read-only and idempotent |
+| `readOnly`, `openWorld` | Optional hint overrides (`openWorld` defaults to `false`) |
+
+The generator writes a `code-gen-error:` line (so the build fails) when a tool name is invalid or duplicated, `title` or `<description>` is missing, a mutation omits `destructive`/`idempotent`, the feature is not `area="user"`, the operation is `requestRouted`, `requestType` is not a request `<entity>` of the feature, or the result is a full document. Results must be a projection, a class-only type, or a feature entity.
+
+Generated per feature: `{feature}.operations.ts` (the `I{Feature}Operations` contract, one member per MCP-enabled operation) and `{feature}.mcp.base.ts` (tool definitions with input/output JSON Schemas). `features/mcp.registry.ts` binds each feature's tools to its hand-written `{Feature}Controller` (in `{feature}.controller.ts`), which declares `implements I{Feature}Operations`.
+
+There is no service layer: MCP calls the controller method directly, the same method HTTP routes to.
+
+- **Method names** match the XML operation names (`nameUpdate`, not `name`).
+- **Signature** is `(request: FeatureRequest, input: I{Request})`. `FeatureRequest` carries only `auth.payload` and `account`, which is what `AuthGuard` leaves on an HTTP request and what MCP builds from the verified gateway identity.
+- **Compiler checks:** the contract uses property form, so a method still typed `StencilRequest` fails the build (TS2416), as does an operation added to the XML without a controller method. If an operation needs the raw HTTP request, move the shared logic into a private method both paths call; an operation that cannot do that is not an MCP candidate.
+- **Guards:** `AuthGuard`/`RateLimitGuard`/`Sanitize.for` apply on HTTP. MCP applies the equivalent checks itself (verified identity, live account, regional home, per-tool rate limit, request-model validation) before calling the method.
+
+Pattern details: `ai/patterns/mcp.md`.
 
 JSON-packed string columns: suffix `_json` and set `html="true"` (see `.cursor/rules/json-packed-fields.mdc`). Schema comments describe the element's own purpose, not a downstream consumer (`.cursor/rules/schema-comment-scope.mdc`).
 

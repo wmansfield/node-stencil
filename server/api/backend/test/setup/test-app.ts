@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -16,6 +16,7 @@ import { AccessControlModule } from 'src/shared/access-control/access-control.mo
 import { CacheModule } from 'src/shared/cache/cache.module';
 import { StorageModule } from 'src/features/platform/storage/storage.module';
 import { UserModule } from 'src/features/user/user.module';
+import { McpModule } from 'src/shared/mcp/mcp.module';
 
 // Middleware
 import { JurisdictionMiddleware } from 'src/shared/access-control/jurisdiction.middleware';
@@ -95,6 +96,7 @@ const mockImageResizeService = {
       CacheModule,
       StorageModule,
       UserModule,
+      McpModule,
    ],
 })
 class TestAppModule implements NestModule {
@@ -109,6 +111,11 @@ export interface TestContext {
    mongoProvider: TestMongoConnectionProvider;
 }
 
+export interface TestAppOptions {
+   /** Extra provider overrides applied after the standard test overrides. */
+   configure?: (builder: TestingModuleBuilder) => TestingModuleBuilder;
+}
+
 /**
  * Boots a fully-wired NestJS app backed by an in-memory MongoDB.
  *
@@ -117,7 +124,11 @@ export interface TestContext {
  *   // … run tests with supertest against ctx.app …
  *   await teardownTestApp(ctx);
  */
-export async function createTestApp(): Promise<TestContext> {
+export async function createTestApp(options: TestAppOptions = {}): Promise<TestContext> {
+   // Tests authenticate through TestJwtMiddleware, which models local auth. A developer's .env may
+   // configure the real identity provider (FIREBASE_PROJECT_ID), which tests must not construct.
+   delete process.env.FIREBASE_PROJECT_ID;
+
    const existing = process.env.FEDERATION_JURISDICTION ?? '';
    if (!existing.toUpperCase().split(',').includes('TE')) {
       process.env.FEDERATION_JURISDICTION = existing ? `${existing},TE` : 'TE,SHARED';
@@ -132,7 +143,7 @@ export async function createTestApp(): Promise<TestContext> {
    mongoProvider.setUri(mongoUri);
 
    // 3. Build NestJS testing module, replacing MongoConnectionProvider
-   const moduleRef: TestingModule = await Test.createTestingModule({
+   const builder = Test.createTestingModule({
       imports: [TestAppModule],
    })
       .overrideProvider(MongoConnectionProvider)
@@ -142,8 +153,8 @@ export async function createTestApp(): Promise<TestContext> {
       .overrideProvider(CloudStorageHandler)
       .useValue(mockCloudStorageHandler)
       .overrideProvider(ImageResizeService)
-      .useValue(mockImageResizeService)
-      .compile();
+      .useValue(mockImageResizeService);
+   const moduleRef: TestingModule = await (options.configure ? options.configure(builder) : builder).compile();
 
    // 4. Create Express app with the same settings as production main.ts
    const app = moduleRef.createNestApplication<NestExpressApplication>();
