@@ -62,7 +62,7 @@ export class JurisdictionSchemaService {
                version_to_upgrade: JurisdictionSchemaVersion.v2026_05_26,
                upgrade_method: upgradeTo_v2026_05_27,
                version_after: JurisdictionSchemaVersion.v2026_05_27,
-            },
+            }
          ];
 
          const SETTING_KEY = 'schema_version';

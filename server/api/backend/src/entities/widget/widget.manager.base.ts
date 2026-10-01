@@ -510,6 +510,26 @@ export class WidgetManagerBase extends MongoManagerIsolated<Widget> implements S
       return processed;
    }
 
+   
+   async invalidateForJurisdictionAsset(jurisdiction_id: string, _id: string, agent_name?: string): Promise<void> {
+      const referencing = [
+         { asset_id_media: _id },
+         
+      ];
+      const filter: QueryFilter<Widget> = {
+         calculation_utc: { $ne: null },
+         ...(referencing.length === 1 ? referencing[0] : { $or: referencing }),
+      };
+      const update: UpdateQuery<Widget> = {
+         $set: {
+            calculation_utc: null,
+            calculation_agent: agent_name ? agent_name : null,
+         },
+      };
+      await this._updateManyPartialIsolated(jurisdiction_id, filter, update);
+   }
+
+   
    async invalidate(jurisdiction_id: string, _id: string, agent_name?: string): Promise<void> {
       const filter: QueryFilter<Widget> = {
          calculation_utc: { $ne: null },

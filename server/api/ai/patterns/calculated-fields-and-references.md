@@ -131,19 +131,22 @@ recalculation.
 
 ## Freshness
 
-A computed reference is snapshotted when the referencing entity is written. If the
-referenced entity changes later, the snapshot can become stale until the
-referencing row is recalculated.
+A computed reference is snapshotted when the referencing entity is written.
+`insert` and `replace` call `calculateAndPersist`, which calls `applyCalculations`.
+The snapshot is not copied onto the document before that hook runs.
 
-If referenced-entity changes should automatically invalidate the snapshot, add
-`foreignKeyInvalidatesMe="true"` to the foreign-key field:
+If the referenced entity changes later, `foreignKeyInvalidatesMe="true"` on the
+foreign-key field marks every referencing row dirty (`calculation_utc` null, blank
+agent). The entity synchronizer then runs `applyCalculations` again. The parent
+write does not insert a new snapshot.
 
 ```xml
 <field type="Uuid" foreignKey="Thing" foreignKeyField="_id" recalculate="true" foreignKeyInvalidatesMe="true">thing_id</field>
 ```
 
 Use this when the projected fields change often enough that stale snapshots would
-matter.
+matter. A value of `:Info` limits that dirtying to one perspective update.
+`true` covers every perspective update and full replace.
 
 ## Cross-Tenant References
 

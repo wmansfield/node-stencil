@@ -9,7 +9,7 @@ import classNames from '@/utils/classNames';
 import Loading from './Loading';
 import { closeModal, openModal } from '../ui/Dialog/modalSlice';
 import Alert from './Alert';
-import StencilUtils from '@/utils/StencilUtils';
+import StencilUtils from '@/utils/stencilUtils';
 import { AssetArea } from '@/stencil/models/entities/assetarea';
 import { AssetDependency } from '@/stencil/models/entities/assetdependency';
 import { ActionResult } from '@/stencil/models/action-result';

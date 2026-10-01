@@ -12,7 +12,7 @@ import {
    useTriggerRoleSyncMutation,
    useTriggerInvalidateEverythingMutation,
 } from '@/stencil/endpoints/features/admin/taskApi';
-import StencilUtils from '@/utils/StencilUtils';
+import StencilUtils from '@/utils/stencilUtils';
 
 type Task = {
    name: string;

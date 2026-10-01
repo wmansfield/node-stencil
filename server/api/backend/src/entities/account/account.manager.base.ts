@@ -724,6 +724,26 @@ export class AccountManagerBase extends MongoManagerIsolated<Account> implements
       return processed;
    }
 
+   
+   async invalidateForJurisdictionAsset(jurisdiction_id: string, _id: string, agent_name?: string): Promise<void> {
+      const referencing = [
+         { asset_id_avatar: _id },
+         
+      ];
+      const filter: QueryFilter<Account> = {
+         calculation_utc: { $ne: null },
+         ...(referencing.length === 1 ? referencing[0] : { $or: referencing }),
+      };
+      const update: UpdateQuery<Account> = {
+         $set: {
+            calculation_utc: null,
+            calculation_agent: agent_name ? agent_name : null,
+         },
+      };
+      await this._updateManyPartialIsolated(jurisdiction_id, filter, update);
+   }
+
+   
    async invalidate(jurisdiction_id: string, _id: string, agent_name?: string): Promise<void> {
       const filter: QueryFilter<Account> = {
          calculation_utc: { $ne: null },

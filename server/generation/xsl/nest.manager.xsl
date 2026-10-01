@@ -3,6 +3,7 @@
 <xsl:key name="perspectiveKey" match="items/item/field[string-length(@perspective)>0]" use="concat(../@name, @perspective)" />
 <xsl:key name="extraValidationKey" match="items/item/field[string-length(@extraValidation)>0]" use="concat(../@name, @extraValidation)" />
 <xsl:key name="isEnumFilterFieldKey" match="items/item/field[@isEnum='true' and @filter='true']" use="concat(../@name, translate(@type, '[]', ''))" />
+<xsl:key name="invalidatesMeKey" match="items/item/field[string-length(@foreignKeyInvalidatesMe)>0 or @foreignKeyInvalidationCascadesToMe='true']" use="concat(../@name, '|', @foreignKey)" />
 
 <xsl:template match="/">
 
@@ -510,6 +511,12 @@ export class <xsl:value-of select="$name"/>ManagerBase extends MongoManager<xsl:
       <xsl:if test="count(field[string-length(@iInvalidateForeignKey)>0])>0">
       await this.dependencyCoordinator.on<xsl:value-of select="@name"/>Changed(document);
       </xsl:if>
+      <xsl:variable name="parent_name" select="@name"/>
+      <xsl:for-each select="../item/field[@foreignKey=$parent_name and (string-length(@foreignKeyInvalidatesMe)>0 or @foreignKeyInvalidationCascadesToMe='true') and generate-id()=generate-id(key('invalidatesMeKey', concat(../@name, '|', @foreignKey))[1])]">
+      <xsl:if test="count(../field[string-length(@calculated)>0])>0">
+      await this.entities.<xsl:call-template name="Camel"><xsl:with-param name="inputString" select="../@name"/></xsl:call-template>Manager.invalidateFor<xsl:value-of select="$parent_name"/>(<xsl:for-each select="../../item[@name=$parent_name]/field[@tenant='true']">document.<xsl:value-of select="text()"/>, </xsl:for-each>document.<xsl:value-of select="@foreignKeyField"/>, '');
+      </xsl:if>
+      </xsl:for-each>
 
       return document;
 
@@ -615,9 +622,12 @@ export class <xsl:value-of select="$name"/>ManagerBase extends MongoManager<xsl:
       await this.dependencyCoordinator.on<xsl:value-of select="../@name"/>Changed(actual);
       </xsl:if>
       <xsl:variable name="root_name" select="../@name"/>
-      <xsl:for-each select="../../item/field[@foreignKey=$root_name and contains(@foreignKeyInvalidatesMe, concat(':',$perspective))]">
-      // Cascade perspective to <xsl:value-of select="../@name" />
-      await this.entities.<xsl:call-template name="Camel"><xsl:with-param name="inputString" select="../@name"/></xsl:call-template>Manager.invalidateFor<xsl:value-of select="$root_name"/>(<xsl:for-each select="../field[@tenant='true']">perspective.<xsl:value-of select="text()" />, </xsl:for-each>perspective.<xsl:value-of select="@foreignKeyField"/>, '<xsl:value-of select="$root_name"/> changed');</xsl:for-each>
+      <xsl:variable name="root_item" select=".."/>
+      <xsl:for-each select="../../item/field[@foreignKey=$root_name and (@foreignKeyInvalidatesMe='true' or contains(@foreignKeyInvalidatesMe, concat(':',$perspective))) and generate-id()=generate-id(key('invalidatesMeKey', concat(../@name, '|', @foreignKey))[1])]">
+      <xsl:if test="count(../field[string-length(@calculated)>0])>0">
+      await this.entities.<xsl:call-template name="Camel"><xsl:with-param name="inputString" select="../@name"/></xsl:call-template>Manager.invalidateFor<xsl:value-of select="$root_name"/>(<xsl:for-each select="$root_item/field[@tenant='true']">perspective.<xsl:value-of select="text()"/>, </xsl:for-each>perspective.<xsl:value-of select="@foreignKeyField"/>, '');
+      </xsl:if>
+      </xsl:for-each>
       return result.matchedCount &gt; 0;
    }
 
@@ -1073,6 +1083,28 @@ export class <xsl:value-of select="$name"/>ManagerBase extends MongoManager<xsl:
       return processed;
    }
 
+   <xsl:for-each select="field[(string-length(@foreignKeyInvalidatesMe)>0 or @foreignKeyInvalidationCascadesToMe='true') and generate-id()=generate-id(key('invalidatesMeKey', concat(../@name, '|', @foreignKey))[1])]">
+   <xsl:variable name="fk_entity" select="@foreignKey"/>
+   <xsl:variable name="fk_param" select="@foreignKeyField"/>
+   async invalidateFor<xsl:value-of select="$fk_entity"/>(<xsl:for-each select="../field[@tenant='true']"><xsl:value-of select="text()"/>: <xsl:call-template name="NodeType"><xsl:with-param name="type" select="@type"/></xsl:call-template>, </xsl:for-each><xsl:value-of select="$fk_param"/>: string, agent_name?: string): Promise&lt;void&gt; {
+      const referencing = [
+         <xsl:for-each select="../field[@foreignKey=$fk_entity and (string-length(@foreignKeyInvalidatesMe)>0 or @foreignKeyInvalidationCascadesToMe='true')]">{ <xsl:value-of select="text()"/>: <xsl:value-of select="$fk_param"/> },
+         </xsl:for-each>
+      ];
+      const filter: <xsl:value-of select="$filterType"/>&lt;<xsl:value-of select="../@name"/>&gt; = {
+         calculation_utc: { $ne: null },
+         ...(referencing.length === 1 ? referencing[0] : { $or: referencing }),
+      };
+      const update: UpdateQuery&lt;<xsl:value-of select="../@name"/>&gt; = {
+         $set: {
+            calculation_utc: null,
+            calculation_agent: agent_name ? agent_name : null,
+         },
+      };
+      await this._updateManyPartial<xsl:if test="../@tenant='Isolated'">Isolated</xsl:if><xsl:if test="../@tenant='Shared' or ../@tenant='Route'">Shared</xsl:if>(<xsl:for-each select="../field[@tenant='true']"><xsl:value-of select="text()"/>, </xsl:for-each>filter, update);
+   }
+
+   </xsl:for-each>
    async invalidate(<xsl:for-each select="field[@tenant='true']"><xsl:value-of select="text()"/>: <xsl:call-template name="NodeType"><xsl:with-param name="type" select="@type"/></xsl:call-template>, </xsl:for-each><xsl:value-of select="field[1]/text()" />: <xsl:call-template name="NodeType"><xsl:with-param name="type" select="field[1]/@type"/></xsl:call-template>, agent_name?: string): Promise&lt;void&gt; {
       const filter: <xsl:value-of select="$filterType"/>&lt;<xsl:value-of select="@name"/>&gt; = {
          calculation_utc: { $ne: null },

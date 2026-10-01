@@ -203,6 +203,10 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
       await this.postProcessMutationDocument(document, DocumentOperation.replace);
       await this.postProcessMutationProcessPerspective(document.asProcessPerspective(), DocumentOperation.replace);
       
+      await this.entities.accountManager.invalidateForJurisdictionAsset(document.jurisdiction_id, document._id, '');
+      
+      await this.entities.widgetManager.invalidateForJurisdictionAsset(document.jurisdiction_id, document._id, '');
+      
 
       return document;
 
@@ -269,6 +273,10 @@ export class JurisdictionAssetManagerBase extends MongoManagerIsolated<Jurisdict
       if (result.matchedCount > 0) {
          await this.postProcessMutationProcessPerspective(perspective, DocumentOperation.updatePerspective);
       }
+      
+      await this.entities.accountManager.invalidateForJurisdictionAsset(perspective.jurisdiction_id, perspective._id, '');
+      
+      await this.entities.widgetManager.invalidateForJurisdictionAsset(perspective.jurisdiction_id, perspective._id, '');
       
       return result.matchedCount > 0;
    }

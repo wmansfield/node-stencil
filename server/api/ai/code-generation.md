@@ -213,7 +213,7 @@ This table is the generator contract, **not a catalog of what this clone current
 | `foreignKeyField` | field name | Foreign key target field |
 | `foreignKeyComputesMe` | boolean | Child write → sync parent `calculateAndPersist` (eager) |
 | `iInvalidateForeignKey` | boolean | Child write → mark FK parent dirty (`calculation_utc = null`); never fails the child write. Generates `DependencyCoordinator.on{Child}Changed`. |
-| `foreignKeyInvalidatesMe` | boolean | Parent write → mark dependents that reference it dirty (snapshot freshness) |
+| `foreignKeyInvalidatesMe` | `true` or `:Perspective` | Parent write → mark referencing rows dirty (`calculation_utc` null, blank agent) so `applyCalculations` refreshes the snapshot. `true` is every perspective update and replace. `:Info` limits it to that perspective. The snapshot is not written on the parent insert. |
 | `foreignKeyInvalidationCascadesToMe` | boolean | Participate in a longer invalidation cascade |
 | `fakeForeignKey="true"` | boolean | Treat as an FK in types/UI but skip existence checks and delete-reference blocking |
 | `detachedForeign="true"` | boolean | FK target is not in this tenant — do not pass tenant fields into `validateExistence` / invalidate |
