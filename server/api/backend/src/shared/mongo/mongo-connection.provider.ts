@@ -58,15 +58,7 @@ export class MongoConnectionProvider {
          throw new Error(`No MongoDB configuration for tenant: ${tenant_code}`);
       }
 
-      // Get or create encryption keys
       const uri = config.mongo.uri;
-      const keyId = KeyTemplates.TenantDataKey(tenant_code);
-      let dataKey = this.encryptionCache.get(keyId);
-
-      if (!dataKey) {
-         dataKey = await ensureDataKey(this.configResolver, config, keyId);
-         this.encryptionCache.set(keyId, dataKey);
-      }
 
       // Configure Mongoose connection
       let options: ConnectOptions = {
@@ -79,9 +71,19 @@ export class MongoConnectionProvider {
       // Get standard schema
       const collectionDefinitions = getAllSchemas();
 
-      // Configure encrypted fields
+      // Queryable-encryption plumbing loads only when at least one entity declares encrypted fields.
+      // With none, no KMS/key-vault configuration is required (plain Mongo, e.g. local docker).
       const collectionsWithEncryption = collectionDefinitions.filter(x => x.encryptedFields && x.encryptedFields.length > 0);
+      let dataKey: Binary | undefined;
       if (collectionsWithEncryption.length > 0) {
+         const keyId = KeyTemplates.TenantDataKey(tenant_code);
+         dataKey = this.encryptionCache.get(keyId);
+
+         if (!dataKey) {
+            dataKey = await ensureDataKey(this.configResolver, config, keyId);
+            this.encryptionCache.set(keyId, dataKey);
+         }
+
          const encryptionDatabase = await this.configResolver.getValue(ConfigTemplates.EncryptionDatabase());
          const encryptionCollection = await this.configResolver.getValue(ConfigTemplates.EncryptionCollection());
          if (!encryptionDatabase || !encryptionCollection) {
@@ -110,7 +112,7 @@ export class MongoConnectionProvider {
             const existing = await tenantConnection.db!.listCollections({ name: definition.name }).toArray();
 
             if (existing.length === 0) {
-               const encryptedFields: EncryptedField[] = definition.encryptedFields.map(x => ({ ...x, keyId: dataKey }));
+               const encryptedFields: EncryptedField[] = definition.encryptedFields.map(x => ({ ...x, keyId: dataKey! }));
                await tenantConnection.db!.createCollection(definition.name, {
                   encryptedFields: {
                      fields: encryptedFields,
